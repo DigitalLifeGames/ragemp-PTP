@@ -1,4 +1,5 @@
 # Installation
+This process will install rage-mp and all required dependencies.
 ```
 #Prerequisite
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -20,6 +21,18 @@ chmod +x server
 
 
 # Run the server
+This will run an instance of the rage-mp server.
 ```
 ./server
+```
+
+# Setting up Development Environment
+```
+npm install
+```
+
+# Running Tests
+All tests should be ran and pass before build rollouts or any code moves.
+```
+npm test
 ```
