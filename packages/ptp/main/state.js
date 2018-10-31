@@ -1,124 +1,3 @@
-var President = [];
-var VicePresident = [];
-var Security = [];
-var Police = [];
-var Terrorist = [];
-
-
-President.color = "yellow";
-President.name = "President";
-President.spawns = [new mp.Vector3(-427,1115,327)];
-President.blipColor = 70;
-President.weapons = [{
-    datablock: 'knife',
-    ammo: 1000
-},{
-    datablock: "heavyPistol",
-    ammo: 1000
-}];
-President.vehicles = [
-{
-    position: new mp.Vector3(-399,1199,325),
-    datablock: mp.joaat("FBI2")
-},{
-    position: new mp.Vector3(-396,1209,325),
-    datablock: mp.joaat("FBI2")
-},{
-    position: new mp.Vector3(-404,1216,325),
-    datablock: mp.joaat("baller5")
-},{
-    position: new mp.Vector3(-407,1206,325),
-    datablock: mp.joaat("FBI")
-},{
-    datablock: mp.joaat("FBI"),
-    position: new mp.Vector3(-405,1238,325),
-},{
-    datablock: mp.joaat("FBI2"),
-    position: new mp.Vector3(-390,1191,325)
-},{
-    datablock: mp.joaat("FBI"),
-    position: new mp.Vector3(-386,1201,325)
-},{
-    datablock: mp.joaat("FBI"),
-    position: new mp.Vector3(-383,1214,325)
-},{
-    datablock: mp.joaat("FBI"),
-    position: new mp.Vector3(-399,1235,325)
-}];
-
-VicePresident.color = "yellow";
-VicePresident.name = "Vice President";
-VicePresident.hidden = true;
-VicePresident.spawns = [new mp.Vector3(-427,1110,327)];
-VicePresident.weapons = [{
-    datablock: 'micro_smg',
-    ammo: 1000
-}];
-VicePresident.vehicles = [];
-
-Security.color = "green";
-Security.blipColor = 11;
-Security.name = "Security";
-Security.spawns = [new mp.Vector3(-422,1213,325)];
-Security.weapons = [{
-    datablock: 'micro_smg',
-    ammo: 1000
-}];
-Security.vehicles = [];
-
-Police.color = "blue";
-Police.blipColor = 3;
-Police.spawns = [new mp.Vector3(455,-1017,28)];
-Police.name = "Police";
-Police.weapons = [{
-    datablock: 'micro_smg',
-    ammo: 1000
-}];
-Police.vehicles = [
-{
-        datablock: mp.joaat("Police3"),
-        position: new mp.Vector3(446,-1025,28)
-    },{
-        datablock: mp.joaat("Police3"),
-        position: new mp.Vector3(442,-1025,28)
-    },{
-        datablock: mp.joaat("Sheriff2"),
-        position: new mp.Vector3(438,-1026,28)
-    },{
-        datablock: mp.joaat("Sheriff2"),
-        position: new mp.Vector3(434,-1026,28)
-    },{
-        datablock: mp.joaat("PoliceT"),
-        position: new mp.Vector3(431,-1027,28)
-    },{
-        datablock: mp.joaat("PoliceT"),
-        position: new mp.Vector3(427,-1027,28)
- }];
-
-Terrorist.name = "Terrorist";
-Terrorist.color = "red";
-Terrorist.blipColor = 6;
-Terrorist.spawns = [new mp.Vector3(-497,-2187,8)];
-Terrorist.weapons = [{
-    datablock: 'micro_smg',
-    ammo: 1000
-}];
-Terrorist.vehicles = [{
-    datablock: mp.joaat("Cheetah"),
-    position: new mp.Vector3(-510,-2176,7)
- },{
-     datablock: mp.joaat("SultanRS"),
-     position: new mp.Vector3(-513,-2179,7)
- },{
-    datablock: mp.joaat("Bullet"),
-    position: new mp.Vector3(-515,-2181,8)
- },{
-     datablock: mp.joaat("Bati"),
-    position: new mp.Vector3(-517,-2184,8)
- }];
-var Teams = [President,Terrorist,VicePresident,Security,Police];
-
-
 /*
 President
 The president, signified by a YELLOW marker, visible by larger size over any other class markers on the map, is the main target. One life, once killed, Vice President becomes the President.
@@ -142,12 +21,22 @@ class GameState
     gameObjects = [];
     */
 
-    constructor() {
+    constructor(options) {
+        //Load options
+        options.teams = options.teams.sort((a,b)=> a.minPlayers < b.minPlayers);
+
+        this.teams = [];
+        this.minPlayers = 0;
         this.players = [];
-        this.minPlayers = 2;
         this.state = 0;
         this.gameObjects = [];
-        this.teams = Teams;
+        options.teams.forEach(t => {
+            var team = [];
+            for(var prop in t)
+                team[prop] = t[prop];
+            this.teams.push(team);
+            this.minPlayers += t.minPlayers;
+        });
     }
     start() {
         //Select all players

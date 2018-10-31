@@ -1,15 +1,16 @@
 var assert = require("assert");
 mp = require("./mock/Multiplayer.js");
 var GameState = require("../packages/ptp/main/state.js").GameState;
-
+var preferences = require("../packages/ptp/configs/default.js");
 
 describe('Team Balance Tests',() => {
+
     describe('Game starts 5 players',() => {
         it('should teams be even',function () {
 
             var expected = [1,1,1,1,1];
 
-            let Game = new GameState();
+            let Game = new GameState(preferences);
 
             Game.add(new mp.Player("Plornt"));
             Game.add(new mp.Player("Schamens"));
@@ -24,12 +25,13 @@ describe('Team Balance Tests',() => {
             assert.deepEqual(actual,expected);
         });
     });
+
     describe('Game starts 2 players',() => {
         it('should teams be President, Terrorist',function () {
 
             var expected = [1,1,0,0,0];
 
-            let Game = new GameState();
+            let Game = new GameState(preferences);
 
             Game.add(new mp.Player("Plornt"));
             Game.add(new mp.Player("Schamens"));
@@ -37,7 +39,7 @@ describe('Team Balance Tests',() => {
             Game.teamBalance();
 
             var teams = Game.teams;
-            var actual = [teams[0].length,teams[1].length,teams[2].length,teams[4].length];
+            var actual = [teams[0].length,teams[1].length,teams[2].length,teams[3].length,teams[4].length];
 
             console.log(actual);
             assert.deepEqual(actual,expected);
