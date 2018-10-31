@@ -74,24 +74,25 @@ Police.weapons = [{
     datablock: 'micro_smg',
     ammo: 1000
 }];
-Police.vehicles = [{
-    datablock: mp.joaat("Police3"),
-    position: new mp.Vector3(446,-1025,28),
- },{
-     datablock: mp.joaat("Police3"),
-     position: new mp.Vector3(442,-1025,28),
- },{
-    datablock: mp.joaat("Sheriff2"),
-    position: new mp.Vector3(438,-1026,28),
- },{
-     datablock: mp.joaat("Sheriff2"),
-    position: new mp.Vector3(434,-1026,28),
- },{
-    datablock: mp.joaat("PoliceT"),
-    position: new mp.Vector3(431,-1027,28),
- },{
-    datablock: mp.joaat("PoliceT"),
-    position: new mp.Vector3(427,-1027,28),
+Police.vehicles = [
+{
+        datablock: mp.joaat("Police3"),
+        position: new mp.Vector3(446,-1025,28)
+    },{
+        datablock: mp.joaat("Police3"),
+        position: new mp.Vector3(442,-1025,28)
+    },{
+        datablock: mp.joaat("Sheriff2"),
+        position: new mp.Vector3(438,-1026,28)
+    },{
+        datablock: mp.joaat("Sheriff2"),
+        position: new mp.Vector3(434,-1026,28)
+    },{
+        datablock: mp.joaat("PoliceT"),
+        position: new mp.Vector3(431,-1027,28)
+    },{
+        datablock: mp.joaat("PoliceT"),
+        position: new mp.Vector3(427,-1027,28)
  }];
 
 Terrorist.name = "Terrorist";
@@ -133,40 +134,51 @@ Dignified in RED, main priority is to hunt and eliminate the President and anyth
 
 class GameState
 {
+    /*
     players = [];
 
     minPlayers = 1; //2
     state = 0;//0 - Not started | 1 - Waiting | 2 - Running
     gameObjects = [];
+    */
 
-    start = function()
-    {
-        var players = this.players;
+    constructor() {
+        this.players = [];
+        this.minPlayers = 2;
+        this.state = 0;
+        this.gameObjects = [];
+        this.teams = Teams;
+    }
+    start() {
         //Select all players
         mp.players.forEach((player) =>
         {
-            if(players.indexOf(player) != -1)
+            if(this.players.indexOf(player) != -1)
                 return;
             player.outputChatBox("Welcome to PTP!");
-            players.push(player);
+            this.add(player);
             //this.message("Player was added to ptp...");
         });
+
 
         //Clean up
         this.cleanUp();
 
         //Clear all teams
-        Teams.forEach((team) => {
+        this.teams.forEach((team) => {
             team.splice(0,team.length);
 
             //Spawn vehicles
             team.vehicles.forEach(veh => {
-                this.gameObjects.push(mp.vehicles.new(mp.joaat(veh.datablock), veh.position));
+                try {
+                    this.gameObjects.push(mp.vehicles.new(veh.datablock, veh.position));
+                } catch(e) {
+                    console.log("Unhandled error (state.js)");
+                }
             });
         });
 
-
-        if(this.minPlayers > players.length)
+        if(this.minPlayers > this.players.length)
         {
             this.state = 1;
             console.log("Not enough players to start ptp");
@@ -177,20 +189,35 @@ class GameState
         console.log("Protect the President has begun...");
     }
     //Balances the teams, does not rearrange teams
-    teamBalance = () =>
-    {
+    teamBalance() {
         var exclude = [];
 
         //Balance all teams to at least 1
-        Teams.forEach(team => {
+
+        function determineNextTeam()
+        {
+            if(this.teams[0].length < 1)
+                return Teams[0];
+            if(Teams[1].length < 1)
+                return Teams[1];
+            if(Teams[2].length < 2)
+                return Teams[2];
+        }
+        this.teams.forEach(team => {
             if(team.length < 1)
-                this.moveTeam(this.random(exclude),team);
+            {
+                var pl = this.random(exclude);
+                if(!pl)
+                    console.log(`Not enough players for team ${team.name}`);
+                else
+                    this.moveTeam(pl,team);
+            }
             exclude.push(team);
         });
 
         //Gather rest of the players
         this.players.forEach(pl => {
-            if(Teams.indexOf(pl.team) == -1)
+            if(this.teams.indexOf(pl.team) == -1)
             {
                 //Determine team
                 if(Terrorist.length < Security.length || Terrorist.length < Security.length+Police.length)
@@ -203,38 +230,37 @@ class GameState
         });
 
         console.log("-- Team Balance Report --");
-        Teams.forEach(team => {
+        console.log(`-- ${this.players.length} total players`);
+        this.teams.forEach(team => {
             var str = "";
             team.forEach(pl => str += pl.name + " | ");
-            console.log("-- " + team.length + ": " + team.name + " | " + str + " --");
+            console.log("-- " + team.length + ": " + team.name + " | " + str);
         });
         console.log("-- " + this.gameObjects.length + " objects --")
         console.log("-------------------------");
     }
-    cleanUp = () =>
-    {
+    cleanUp() {
         this.gameObjects.forEach(obj =>
         {
             obj.destroy();
         });
         this.gameObjects = [];
+        //mp.vehicles.toArray().forEach(v => v.destroy());
     }
-    reset = () => {
+    reset() {
         this.message("Resetting PTP...");
         this.start();
     }
-    message = (text) => {
+    message(text) {
         console.log("[PTP] " + text);
         this.players.forEach((p) => p.outputChatBox(text));
     }
-    setPresident = (player) =>
-    {
+    setPresident(player) {
         console.log(`${player.name} is now President!`);
         this.moveTeam(player,President);
         //this.message("President has spawned");
     }
-    moveTeam = (player,team) =>
-    {
+    moveTeam(player,team) {
         if(player.team)
             player.team.splice(player.team.indexOf(player),1);
         player.team = team;
@@ -246,8 +272,8 @@ class GameState
         player.spawn(spawn);
 
         //Blip
-        if(player.blip)
-            player.blip.destroy();
+       // if(player.blip)
+        //    player.blip.destroy();
         if(!team.hidden)
         {
             player.blip = mp.blips.new(1, player.position,
@@ -267,24 +293,36 @@ class GameState
         });
     }
     
-    random = (excludeTeams) => {
+    random(excludeTeams) {
         var players = [];
         this.players.forEach(pl =>
         {
-            if(excludeTeams.indexOf(pl.team) == -1 || pl.team == undefined || fromTeams == undefined)
+            if(excludeTeams.indexOf(pl.team) == -1 || pl.team == undefined || excludeTeams == undefined)
                 players.push(pl);
         });
+        if(players.length == 0)
+            return false;
         var target = players[Math.floor(players.length * Math.random())];
+
+        //console.log(players[1]);
+        if(!target)
+        {
+            //console.log("something broke idk");
+            //var stack = new Error().stack
+            //console.log( stack );
+        }
         return target;
 
     }
-    add = (player) => {
+    add(player) {
+        if(this.players.indexOf(player) != -1)
+            return;
         this.players.push(player);
         if(this.state == 1) //waiting to start
             return this.start();
     }
-    remove = (player) => {
-        this.players.remove(player);
+    remove(player) {
+        this.players.splice(this.players.indexOf(player),1);
 
         //if(this.minPlayers > players.length)
     }

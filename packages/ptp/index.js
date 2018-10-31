@@ -1,3 +1,6 @@
+//Init extensions
+require("./main/models/Multiplayer.js");
+
 // Init events.
 require('./main/events.js');
 // Init commands.

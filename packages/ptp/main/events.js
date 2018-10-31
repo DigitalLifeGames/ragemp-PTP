@@ -8,15 +8,21 @@ mp.events.add('playerExitVehicle', (player) => {
 });
 mp.events.add('playerDeath',(player) =>
 {
+    if(!player.team)
+    {
+        player.call('playerDeath');
+        return;
+    }
     var spawns = player.team.spawns;
     var spawn = spawns[spawns.length * Math.random()];
     if(!spawn)
         spawn = new mp.Vector3(0,0,0);
     player.spawn(spawn);
     player.health = 100;
-    mp.vehicles.new(mp.joaat(vehName), pos);
 });
 mp.events.add('playerJoin',(player) => {
+    console.log(`${player.name} has joined the server.`);
+    mp.players.broadcast(`${player.name} has joined the server.`);
     mp.Game.add(player);
 });
 mp.events.add('playerQuit',(player) => {
