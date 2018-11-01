@@ -50,3 +50,29 @@ mp.events.addCommand('reload',(player,config) => {
     mp.Game = new mp.Game.constructor(preferences);
     mp.Game.start();
 });
+mp.events.addCommand('move',(player,targetName,team) => {
+    if(!team)
+    {
+        team = targetName;
+        targetName = player.name;
+    }
+    var target = mp.fcbn(targetName);
+    if(!target)
+    {
+        player.outputChatBox(`Could not find player by name '${targetName}'`);
+        return;
+    }
+
+    var real = undefined;
+    mp.Game.teams.forEach(t => {
+        if(t.name.toLowerCase() == team.toLowerCase())
+            real = t;
+    });
+    if(!real)
+    {
+        player.outputChatBox(`Could not find team '${team}'`);
+        return;
+    }
+        mp.Game.moveTeam(target,real);
+    target.outputChatBox(`Moved to team ${real.name}`);
+});

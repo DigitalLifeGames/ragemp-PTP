@@ -7,7 +7,7 @@ mp.events.add('playerExitVehicle', (player) => {
     console.log("Dude exited a vehicle");
 });
 mp.events.add("playerChat",(player, text) => {
-    mp.players.broadcast(`[${player.name}: ${text}]`);
+    MessageAll(`[${player.name}]: ${text}`);
 });
 mp.events.add('playerDeath',(player) =>
 {
@@ -17,11 +17,16 @@ mp.events.add('playerDeath',(player) =>
         return;
     }
     var spawns = player.team.spawns;
-    var spawn = spawns[spawns.length * Math.random()];
+    var spawn = spawns[Math.floor(spawns.length * Math.random())];
     if(!spawn)
         spawn = new mp.Vector3(0,0,0);
     player.spawn(spawn);
     player.health = 100;
+
+    //Skin
+    var skins = mp.joaat(player.team.skins);
+    var skin = skins[Math.floor(skins.length * Math.random())];
+    player.model = skins[skin];
 });
 mp.events.add('playerJoin',(player) => {
     console.log(`${player.name} has joined the server.`);

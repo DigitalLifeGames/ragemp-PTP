@@ -10,12 +10,6 @@ Dignified in BLUE, can choose to hunt the Terrorists or simply assist in protect
 Terrorist
 Dignified in RED, main priority is to hunt and eliminate the President and anything in their path preventing them from doing that.
 */
-
-function MessageAll(msg)
-{
-    mp.players.broadcast(msg);
-    Console.log(msg);
-}
 class GameState
 {
     /*
@@ -81,7 +75,22 @@ class GameState
         this.teamBalance();
         this.state = 2;
         Console.log("Protect the President has begun...");
+        this.running = setInterval(this.tick,1000);
         return true;
+    }
+    tick() {
+        //For every player...
+        mp.players.forEach( (player, id) => {
+            //Check if his/her blip exists and if they are alive...
+            if (player.blip && player.health > 0) {
+                //And update the blip position
+                player.blip.position = player.position;
+            
+                //Quick note: The 'player.health > 0' was necessary
+                //because if we dont do that the server just crashes.
+                //Looks like we can't get player position if he/she is dead.
+            }
+	    });
     }
     //Balances the teams, does not rearrange teams
     teamBalance() {
@@ -227,11 +236,18 @@ class GameState
         player.spawn(spawn);
 
         //Blip
-       // if(player.blip)
-        //    player.blip.destroy();
+        if(player.blip)
+        {
+            try {
+            player.blip.destroy();
+            }
+            catch(e) {
+                console.log(e);
+            }
+            player.blip = undefined;
+        }
         if(team.hidden != false)
         {
-            console.log(player.position);
             player.blip = mp.blips.new(1, player.position,
             {
                 name: player.name,
@@ -284,6 +300,9 @@ class GameState
         //if(this.minPlayers > players.length)
     }
     endRound(winner) {
+        //Clean up
+        this.cleanUp();
+        
         if(winner)
         {}
     }

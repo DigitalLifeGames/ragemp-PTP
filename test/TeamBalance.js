@@ -153,5 +153,50 @@ describe('Team Balance Tests',() => {
             assert.equal(true,(teams[1].name == "Terrorist" || teams[1].name == "Police"));
         });
     });
+
+    describe('Game starts 3 players',() => {
+        it('should teams be President, Terrorist, Police',function () {
+
+            var expected = [1,1,0,0,1];
+
+            let Game = new GameState({
+                teams : [{
+                    minPlayers: 1,
+                    maxPlayers: 1,
+                    name: "President",
+                    spawns: [new mp.Vector3(0,0,0)]
+                },{
+                    minPlayers: 0,
+                    maxPlayers: 1,
+                    name: "Vice President",
+                    spawns: [new mp.Vector3(0,0,0)]
+                },{
+                    minPlayers: 1,
+                    maxPlayers: false,
+                    name: "Terrorist",
+                    spawns: [new mp.Vector3(0,0,0)]
+                },{
+                    minPlayers: 0,
+                    name: "Security",
+                    spawns: [new mp.Vector3(0,0,0)]
+                },{
+                    minPlayers: 0,
+                    name: "Police",
+                    spawns: [new mp.Vector3(0,0,0)]
+                }]
+            });
+
+            Game.add(new mp.Player("Plornt"));
+            Game.add(new mp.Player("Schamens"));
+            Game.add(new mp.Player("Tricky"));
+
+            Game.teamBalance();
+
+            var teams = Game.teams;
+            var actual = [teams[0].length,teams[1].length,teams[2].length,teams[3].length,teams[4].length];
+
+            assert.deepEqual(actual,expected);
+        });
+    });
     
 });

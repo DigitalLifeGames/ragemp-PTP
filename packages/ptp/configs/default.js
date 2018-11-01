@@ -15,6 +15,7 @@ module.exports = {
             datablock: "weapon_heavyPistol",
             ammo: 1000
         }],
+        skins: ["cs_paper"],
         vehicles: [
             {
                 position: new mp.Vector3(-399,1199,325),
@@ -56,7 +57,8 @@ module.exports = {
             datablock: 'weapon_vintagepistol',
             ammo: 1000
         }],
-        vehicles: []
+        vehicles: [],
+        skins: ["mp_m_boatstaff_01"]
     },{
         color: "green",
         name: "Security",
@@ -86,7 +88,8 @@ module.exports = {
             datablock: 'weapon_grenade',
             ammo: 1000
         }],
-        vehicles: []
+        vehicles: [],
+        skins: ["s_m_y_blackops_01","ig_casey","s_m_m_highsec_01","s_m_m_highsec02"]
     },{
         color: "blue",
         name: "Police",
@@ -135,7 +138,8 @@ module.exports = {
             },{
                 datablock: "PoliceT",
                 position: new mp.Vector3(427,-1027,28)
-        }]
+        }],
+        skins: ["s_f_y_cop_01","s_m_y_cop_01","s_m_y_sheriff_01","csb_trafficwarden"]
     },{
         color: "red",
         name: "Terrorist",
@@ -177,6 +181,7 @@ module.exports = {
          },{
              datablock: "Bati",
             position: new mp.Vector3(-517,-2184,8)
-         }]
+         }],
+         skins: ["a_m_m_eastsa_01","u_m_m_edtoh","g_m_y_korlieut_01","cs_lestercrest","cs_terry"]
     }]
 }
