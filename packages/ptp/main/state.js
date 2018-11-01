@@ -122,7 +122,7 @@ class GameState
 
         //Gather rest of the players
         this.players.forEach(pl => {
-            if(this.teams.indexOf(pl.team) == -1)
+            if(this.teams.indexOf(this.getTeam(pl)) == -1)
             {
                 this.teams.forEach(t => {
                     if(t.length == 0)
@@ -225,13 +225,14 @@ class GameState
         //this.message("President has spawned");
     }
     moveTeam(player,team) {
-        if(player.team)
-            player.team.splice(player.team.indexOf(player),1);
+        if(this.getTeam(player))
+            this.getTeam(player).splice(this.getTeam(player).indexOf(player),1);
         player.team = team;
+        player.setVariable("currentTeam",team.name);
         team.push(player);   
-        player.outputChatBox(`<b>You are now on ${player.team.name}!</b>`);
+        player.outputChatBox(`<b>You are now on ${team.name}!</b>`);
         
-        var spawns = player.team.spawns;
+        var spawns = team.spawns;
         var spawn = spawns[Math.floor(spawns.length * Math.random())];
         player.spawn(spawn);
 
@@ -264,13 +265,25 @@ class GameState
             team.weapons.forEach(wep => {
             player.giveWeapon(mp.joaat(wep.datablock),wep.ammo);
         });
+        // both strings and numbers should work
+        //player.setVariable("currentTeam", player.team);
+    }
+
+    getTeam(player)
+    {
+        for(var i=0;i<this.teams.length;i++)
+        {
+            if(this.teams[i].name == player.data.currentTeam)
+                return this.teams[i];
+        }
+        return false;
     }
     
     random(excludeTeams) {
         var players = [];
         this.players.forEach(pl =>
         {
-            if(excludeTeams.indexOf(pl.team) == -1 || pl.team == undefined || excludeTeams == undefined)
+            if(excludeTeams.indexOf(this.getTeam(pl)) == -1 || !this.getTeam(pl) || excludeTeams == undefined)
                 players.push(pl);
         });
         if(players.length == 0)

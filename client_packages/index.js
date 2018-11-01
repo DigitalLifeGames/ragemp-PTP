@@ -1,1 +1,1 @@
-//require('freeroam/index.js');
+require('teams');

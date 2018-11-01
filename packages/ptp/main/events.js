@@ -26,6 +26,7 @@ mp.events.add('playerDeath',(player) =>
     //Skin
     var skins = mp.joaat(player.team.skins);
     var skin = skins[Math.floor(skins.length * Math.random())];
+    console.log(skins[skin],skins);
     player.model = skins[skin];
 });
 mp.events.add('playerJoin',(player) => {

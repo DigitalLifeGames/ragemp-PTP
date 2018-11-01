@@ -50,7 +50,6 @@ mp.events.addCommand('reload',(player,config) => {
     mp.Game = new mp.Game.constructor(preferences);
     mp.Game.start();
 });
-mp.events.addCommand('move',(player,targetName,team) => {
     if(!team)
     {
         team = targetName;
@@ -75,4 +74,9 @@ mp.events.addCommand('move',(player,targetName,team) => {
     }
         mp.Game.moveTeam(target,real);
     target.outputChatBox(`Moved to team ${real.name}`);
+});
+mp.events.addCommand('teams',(player) => {
+    mp.Game.teams.forEach(t => {
+        player.outputChatBox(`|| ${t.name}: ${t.length} players`);
+    });
 });

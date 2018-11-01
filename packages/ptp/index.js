@@ -1,6 +1,6 @@
 //Init extensions
 require("./main/models/Multiplayer.js");
-require("./main/models/CommandLine.js");
+//require("./main/models/CommandLine.js");
 Console = require("./main/models/Logger.js").Console;
 Console.open("./logs/" + Date.now() + ".log");
 

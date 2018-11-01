@@ -13,6 +13,13 @@ class Player
     constructor(name = "Mock Player")
     {
         this.name = name;
+        this.data = {
+            
+        }
+    }
+
+    setVariable(prop,data) {
+        this.data[prop] = data;
     }
 
     removeAllWeapons(){};

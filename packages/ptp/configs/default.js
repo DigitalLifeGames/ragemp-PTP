@@ -144,7 +144,7 @@ module.exports = {
         color: "red",
         name: "Terrorist",
         maxPlayers: false,
-        minPlayers: 1,
+        minPlayers: 0,
         spawns: [new mp.Vector3(-497,-2187,8)],
         blipColor: 6,
         weapons: [{
