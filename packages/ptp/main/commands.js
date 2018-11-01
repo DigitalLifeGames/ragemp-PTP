@@ -50,6 +50,13 @@ mp.events.addCommand('reload',(player,config) => {
     mp.Game = new mp.Game.constructor(preferences);
     mp.Game.start();
 });
+mp.events.addCommand('move',(player,str) => {
+    var args = str.split(" ");
+    var team;
+    var targetName = args[0];
+    args.splice(0,1);
+    if(args.length > 0)
+        team = args.join(" ");
     if(!team)
     {
         team = targetName;
