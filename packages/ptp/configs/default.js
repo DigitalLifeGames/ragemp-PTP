@@ -9,7 +9,7 @@ module.exports = {
         spawns: [new mp.Vector3(-427,1115,327)],
         blipColor: 70,
         weapons: [{
-            datablock: 'weapon_dagger',
+            datablock: 'weapon_bat',
             ammo: 1000
         },{
             datablock: "weapon_heavyPistol",
@@ -53,7 +53,7 @@ module.exports = {
         spawns: [new mp.Vector3(-427,1110,327)],
         blipColor: 70,
         weapons: [{
-            datablock: 'micro_smg',
+            datablock: 'weapon_vintagepistol',
             ammo: 1000
         }],
         vehicles: []
@@ -65,7 +65,25 @@ module.exports = {
         spawns: [new mp.Vector3(-422,1213,325)],
         blipColor: 11,
         weapons: [{
-            datablock: 'micro_smg',
+            datablock: 'weapon_nightstick',
+            ammo: 1000
+        },{
+            datablock: 'weapon_flashlight',
+            ammo: 1000
+        },{
+            datablock: 'weapon_smg',
+            ammo: 1000
+        },{
+            datablock: 'weapon_combatpistol',
+            ammo: 1000
+        },{
+            datablock: 'weapon_heavyshotgun',
+            ammo: 1000
+        },{
+            datablock: 'weapon_specialcarbine_mk2',
+            ammo: 1000
+        },{
+            datablock: 'weapon_grenade',
             ammo: 1000
         }],
         vehicles: []
@@ -77,7 +95,25 @@ module.exports = {
         spawns: [new mp.Vector3(455,-1017,28)],
         blipColor: 3,
         weapons: [{
-            datablock: 'micro_smg',
+            datablock: 'weapon_nightstick',
+            ammo: 1000
+        },{
+            datablock: 'weapon_flashlight',
+            ammo: 1000
+        },{
+            datablock: 'weapon_microsmg',
+            ammo: 1000
+        },{
+            datablock: 'weapon_machinepistol',
+            ammo: 1000
+        },{
+            datablock: 'weapon_pumpshotgun',
+            ammo: 1000
+        },{
+            datablock: 'weapon_compactrifle',
+            ammo: 1000
+        },{
+            datablock: 'weapon_smokegrenade',
             ammo: 1000
         }],
         vehicles: [
