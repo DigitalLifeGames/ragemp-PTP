@@ -11,6 +11,11 @@ Terrorist
 Dignified in RED, main priority is to hunt and eliminate the President and anything in their path preventing them from doing that.
 */
 
+function MessageAll(msg)
+{
+    mp.players.broadcast(msg);
+    Console.log(msg);
+}
 class GameState
 {
     /*
@@ -60,9 +65,9 @@ class GameState
             //Spawn vehicles
             team.vehicles.forEach(veh => {
                 try {
-                    this.gameObjects.push(mp.vehicles.new(veh.datablock, veh.position));
+                    this.gameObjects.push(mp.vehicles.new(mp.joaat(veh.datablock), veh.position));
                 } catch(e) {
-                    console.log("Unhandled error (state.js)");
+                    Console.log("Unhandled error (state.js)");
                 }
             });
         });
@@ -70,64 +75,125 @@ class GameState
         if(this.minPlayers > this.players.length)
         {
             this.state = 1;
-            console.log("Not enough players to start ptp");
-            return;
+            MessageAll(`Not enough players to start ptp (${this.players.length}/${this.minPlayers})`);
+            return false;
         }
         this.teamBalance();
         this.state = 2;
-        console.log("Protect the President has begun...");
+        Console.log("Protect the President has begun...");
+        return true;
     }
     //Balances the teams, does not rearrange teams
     teamBalance() {
         var exclude = [];
 
-        //Balance all teams to at least 1
-
-        function determineNextTeam()
-        {
-            if(this.teams[0].length < 1)
-                return Teams[0];
-            if(Teams[1].length < 1)
-                return Teams[1];
-            if(Teams[2].length < 2)
-                return Teams[2];
-        }
+        //Autofill all required teams
         this.teams.forEach(team => {
-            if(team.length < 1)
+            if(team.length < team.minPlayers)
             {
-                var pl = this.random(exclude);
-                if(!pl)
-                    console.log(`Not enough players for team ${team.name}`);
-                else
-                    this.moveTeam(pl,team);
+                while(team.length < team.minPlayers)
+                {
+                    var pl = this.random(exclude);
+                    if(!pl)
+                        Console.log(`Not enough players for team ${team.name}`);
+                    else
+                        this.moveTeam(pl,team);
+                }
             }
             exclude.push(team);
         });
+
+        //Check teams that have capacity
+        var open = [];
+        this.teams.forEach(team => {
+            if(team.length < team.maxPlayers || !team.maxPlayers)
+                open.push(team);
+        });
+
 
         //Gather rest of the players
         this.players.forEach(pl => {
             if(this.teams.indexOf(pl.team) == -1)
             {
-                //Determine team
-                if(Terrorist.length < Security.length || Terrorist.length < Security.length+Police.length)
-                    this.moveTeam(pl,Terrorist);
-                else if(Security.length < Police.length)
-                    this.moveTeam(pl,Security);
-                else
-                    this.moveTeam(pl,Police);
+                this.teams.forEach(t => {
+                    if(t.length == 0)
+                        this.moveTeam(pl,t);
+                });
+                if(this.teams.indexOf(pl.team) != -1)
+                    return;
+                var rTeam = open[Math.floor(open.length * Math.random())];
+                this.moveTeam(pl,rTeam);
+                if(rTeam.maxPlayers != false && rTeam.length >= rTeam.maxPlayers)
+                    open.splice(open.indexOf(rTeam),1);
             }
         });
-
-        console.log("-- Team Balance Report --");
-        console.log(`-- ${this.players.length} total players`);
+        
+        Console.log("-- Team Balance Report --");
+        Console.log(`-- ${this.players.length} total players`);
         this.teams.forEach(team => {
             var str = "";
             team.forEach(pl => str += pl.name + " | ");
-            console.log("-- " + team.length + ": " + team.name + " | " + str);
+            Console.log("-- " + team.length + ": " + team.name + " | " + str);
         });
-        console.log("-- " + this.gameObjects.length + " objects --")
-        console.log("-------------------------");
+        Console.log("-- " + this.gameObjects.length + " objects --")
+        Console.log("-------------------------");
     }
+    /*   teamBalance() {
+        
+        var exclude = [];
+
+        //Gather rest of the players
+        for(var pid=0;pid<this.players.length;pid++)
+        {
+            var pl = this.players[pid];
+
+            //Check if player HAS a team
+            if(pl.team)
+                continue;
+
+            var open = [];
+            var required = [];
+            for(var tid=0;tid<this.teams.length;tid++)
+            {
+                var team = this.teams[tid];
+                
+                //Check if it NEEDS people
+                if(team.length < team.minPlayers)
+                {
+                    open.push(team);
+                    required.push(team);
+                    break;
+                }
+                else if(required.indexOf(team) != -1)
+                    required.splice(required.indexOf(team),1);
+                //Check if it has ANY people (TODO: Include weights)
+                if(team.length < 1 && required.length == 0)
+                {
+                    open.push(team);
+                    break;
+                }
+                //Check if it can have MORE people
+                if(team.length < team.maxPlayers || !team.maxPlayers)
+                {
+                    open.push(team);
+                }
+            }
+            if(open.length == 0)
+                break;
+            var rTeam = open[Math.floor(open.length * Math.random())];
+            this.moveTeam(pl,rTeam);
+        }
+
+        Console.log("-- Team Balance Report --");
+        Console.log(`-- ${this.players.length} total players`);
+        this.teams.forEach(team => {
+            var str = "";
+            team.forEach(pl => str += pl.name + " | ");
+            Console.log("-- " + team.length + ": " + team.name + " | " + str);
+        });
+        Console.log("-- " + this.gameObjects.length + " objects --")
+        Console.log("-------------------------");
+     */
     cleanUp() {
         this.gameObjects.forEach(obj =>
         {
@@ -141,11 +207,11 @@ class GameState
         this.start();
     }
     message(text) {
-        console.log("[PTP] " + text);
+        Console.log("[PTP] " + text);
         this.players.forEach((p) => p.outputChatBox(text));
     }
     setPresident(player) {
-        console.log(`${player.name} is now President!`);
+        Console.log(`${player.name} is now President!`);
         this.moveTeam(player,President);
         //this.message("President has spawned");
     }
@@ -155,7 +221,7 @@ class GameState
         player.team = team;
         team.push(player);   
         player.outputChatBox(`<b>You are now on ${player.team.name}!</b>`);
-
+        
         var spawns = player.team.spawns;
         var spawn = spawns[Math.floor(spawns.length * Math.random())];
         player.spawn(spawn);
@@ -163,8 +229,9 @@ class GameState
         //Blip
        // if(player.blip)
         //    player.blip.destroy();
-        if(!team.hidden)
+        if(team.hidden != false)
         {
+            console.log(player.position);
             player.blip = mp.blips.new(1, player.position,
             {
                 name: player.name,
@@ -177,7 +244,8 @@ class GameState
 
         //Weapons
         player.removeAllWeapons();
-        team.weapons.forEach(wep => {
+        if(team.weapons)
+            team.weapons.forEach(wep => {
             player.giveWeapon(mp.joaat(wep.datablock),wep.ammo);
         });
     }
@@ -193,12 +261,12 @@ class GameState
             return false;
         var target = players[Math.floor(players.length * Math.random())];
 
-        //console.log(players[1]);
+        //Console.log(players[1]);
         if(!target)
         {
-            //console.log("something broke idk");
+            //Console.log("something broke idk");
             //var stack = new Error().stack
-            //console.log( stack );
+            //Console.log( stack );
         }
         return target;
 
@@ -214,6 +282,19 @@ class GameState
         this.players.splice(this.players.indexOf(player),1);
 
         //if(this.minPlayers > players.length)
+    }
+    endRound(winner) {
+        if(winner)
+        {}
+    }
+    end() {
+        this.endRound();
+        //Remove all players
+        this.players.forEach(pl => {
+            pl.game = undefined;
+            
+        });
+        MessageAll("Protect the President has ended.");
     }
 
 }

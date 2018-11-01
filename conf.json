@@ -3,6 +3,6 @@
 	"name" : "[Beta] Protect the President", 
 	"gamemode" : "ptp", 
 	"stream-distance" : 500.0,
-	"announce" : false,
+	"announce" : true,
 	"port": 22005
 }

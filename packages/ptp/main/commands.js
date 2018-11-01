@@ -11,7 +11,7 @@ mp.events.addCommand('cleanup', (player) => {
     mp.players.broadcast(`There are ${mp.Game.gameObjects.length} objects spawned.`);
     mp.Game.cleanUp();
 });
-mp.events,addCommand('tp',(player,location) => {
+mp.events.addCommand('tp',(player,location) => {
     var target = mp.fcbn(location);
     if(target)
     {
@@ -37,4 +37,16 @@ mp.events.addCommand('kill',(player) => {
 mp.events.addCommand('reset',() =>
 {
     mp.Game.reset();
+});
+mp.events.addCommand('reload',(player,config) => {
+    //New game
+    if(!config)
+        config = "default";
+    var path = `../configs/${config}.js`;
+    delete require.cache[require.resolve(path)];
+    var preferences = require(path);
+    var game = mp.Game;
+    game.end();
+    mp.Game = new mp.Game.constructor(preferences);
+    mp.Game.start();
 });

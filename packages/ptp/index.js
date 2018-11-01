@@ -1,5 +1,6 @@
 //Init extensions
 require("./main/models/Multiplayer.js");
+Console = require("./main/models/Logger.js").Console;
 
 // Init events.
 require('./main/events.js');
@@ -11,6 +12,6 @@ var preferences = require("./configs/default.js");
 
 let Game = require("./main/state.js").GameState;
 
-var CurrentGame = mp.Game = new Game(preferences);
+global.CurrentGame = mp.Game = new Game(preferences);
 
 CurrentGame.start();
