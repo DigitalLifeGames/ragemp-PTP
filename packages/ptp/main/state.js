@@ -104,7 +104,10 @@ class GameState
                 {
                     var pl = this.random(exclude);
                     if(!pl)
+                    {
                         Console.log(`Not enough players for team ${team.name}`);
+                        return;
+                    }
                     else
                         this.moveTeam(pl,team);
                 }
