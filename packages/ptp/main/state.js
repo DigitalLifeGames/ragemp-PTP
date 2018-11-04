@@ -276,7 +276,7 @@ class GameState
     {
         for(var i=0;i<this.teams.length;i++)
         {
-            if(this.teams[i].name == player.data.currentTeam)
+            if(this.teams[i].name == player.getVariable("currentTeam"))
                 return this.teams[i];
         }
         return false;
@@ -309,10 +309,17 @@ class GameState
         this.players.push(player);
         if(this.state == 1) //waiting to start
             return this.start();
+        
+        this.teamBalance();
     }
     remove(player) {
+        var t = this.getTeam(player);
+        if(t)
+        {
+            t.splice(t.indexOf(player),1);
+        }
         this.players.splice(this.players.indexOf(player),1);
-
+        this.teamBalance();
         //if(this.minPlayers > players.length)
     }
     endRound(winner) {

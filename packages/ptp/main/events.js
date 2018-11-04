@@ -35,5 +35,6 @@ mp.events.add('playerJoin',(player) => {
     mp.Game.add(player);
 });
 mp.events.add('playerQuit',(player) => {
+    Console.log(`${player.name} has disconnected.`);
     mp.Game.remove(player);
 });

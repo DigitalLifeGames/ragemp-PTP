@@ -2,7 +2,7 @@
 require("./main/models/Multiplayer.js");
 //require("./main/models/CommandLine.js");
 Console = require("./main/models/Logger.js").Console;
-Console.open("./logs/" + Date.now() + ".log");
+Console.open("logs/" + Date.now() + ".log");
 
 // Init events.
 require('./main/events.js');

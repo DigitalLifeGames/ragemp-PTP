@@ -1,1 +1,1 @@
-require('teams');
+require('ptp');

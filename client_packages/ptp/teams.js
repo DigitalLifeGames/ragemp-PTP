@@ -1,3 +1,4 @@
+/*
 const RelationshipNames = {
     Player: "PLAYER",
     Default: "RG_PLAYER_NEUTRAL",
@@ -13,6 +14,8 @@ const RelationshipTypes = {
     Hate: 5,
     Pedestrians: 255
 };
+
+console.log("hit this");
 
 AddRelationshipGroup('President');
 AddRelationshipGroup('Vice President');
@@ -34,8 +37,10 @@ SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Police');
 SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Security');
 SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Vice President');
 
+*/
 
 
+/*
 mp.events.add("entityStreamIn", (entity) => {
     if (entity.type !== "player") return;
     let currentTeam = entity.getVariable("currentTeam");
@@ -44,4 +49,4 @@ mp.events.add("entityStreamIn", (entity) => {
         return;
     
     entity.setRelationshipGroupHash(currentTeam);
-});
+});*/

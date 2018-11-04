@@ -29,7 +29,7 @@ Console.prototype = {
 		this.opened = true;
 		this.filepath = __dirname + "/" + path;
 
-		this.log("Log file opened on [" + path + "]");
+		this.log("Log file opened on [" + this.filepath + "]");
 	},
 	write: function(line)
 	{
