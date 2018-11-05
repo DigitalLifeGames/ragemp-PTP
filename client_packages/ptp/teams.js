@@ -1,4 +1,4 @@
-/*
+
 const RelationshipNames = {
     Player: "PLAYER",
     Default: "RG_PLAYER_NEUTRAL",
@@ -17,30 +17,30 @@ const RelationshipTypes = {
 
 console.log("hit this");
 
-AddRelationshipGroup('President');
-AddRelationshipGroup('Vice President');
-AddRelationshipGroup('Security');
-AddRelationshipGroup('Police');
-AddRelationshipGroup('Terrorist');
+mp.game.ped.addRelationshipGroup('President');
+mp.game.ped.addRelationshipGroup('Vice President');
+mp.game.ped.addRelationshipGroup('Security');
+mp.game.ped.addRelationshipGroup('Police');
+mp.game.ped.addRelationshipGroup('Terrorist');
 
-SetRelationshipBetweenGroups(RelationshipTypes.Companion, 'President', 'Vice President');
-SetRelationshipBetweenGroups(RelationshipTypes.Companion, 'President', 'Security');
-SetRelationshipBetweenGroups(RelationshipTypes.Neutral, 'President', 'Police'); //Maybe change
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Companion, 'President', 'Vice President');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Companion, 'President', 'Security');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Neutral, 'President', 'Police'); //Maybe change
 
-SetRelationshipBetweenGroups(RelationshipTypes.Companion, 'Vice President', 'Security');
-SetRelationshipBetweenGroups(RelationshipTypes.Neutral, 'Vice President', 'Police'); //Maybe change
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Companion, 'Vice President', 'Security');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Neutral, 'Vice President', 'Police'); //Maybe change
 
-SetRelationshipBetweenGroups(RelationshipTypes.Companion, 'Police', 'Security'); //Maybe change
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Companion, 'Police', 'Security'); //Maybe change
 
-SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'President');
-SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Police');
-SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Security');
-SetRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Vice President');
-
-*/
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'President');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Police');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Security');
+mp.game.ped.setRelationshipBetweenGroups(RelationshipTypes.Hate, 'Terrorist', 'Vice President');
 
 
-/*
+
+
+
 mp.events.add("entityStreamIn", (entity) => {
     if (entity.type !== "player") return;
     let currentTeam = entity.getVariable("currentTeam");
@@ -49,4 +49,4 @@ mp.events.add("entityStreamIn", (entity) => {
         return;
     
     entity.setRelationshipGroupHash(currentTeam);
-});*/
+});

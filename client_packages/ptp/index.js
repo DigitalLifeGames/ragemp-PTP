@@ -1,1 +1,1 @@
-require("./teams.js");
+require("ptp/teams.js");
