@@ -246,7 +246,7 @@ class GameState
             player.blip.destroy();
             }
             catch(e) {
-                console.log(e);
+                console.log("Blip Error:",e);
             }
             player.blip = undefined;
         }

@@ -21,6 +21,9 @@ class Player
     setVariable(prop,data) {
         this.data[prop] = data;
     }
+    getVariable(prop) {
+        return this.data[prop];
+    }
 
     removeAllWeapons(){};
     giveWeapon(){}
