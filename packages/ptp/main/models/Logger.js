@@ -64,7 +64,7 @@ Console.prototype = {
 		if(!color)
 			color = r;
 
-		process.stdout.write(color + util.format(obj) + r + "\n");
+		console.log(color + util.format(obj) + r);
 		this.write((this.options.log_colors ? color:``) + util.format(obj) + r + "\n");
 	},
 

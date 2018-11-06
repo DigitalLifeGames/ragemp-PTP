@@ -207,9 +207,10 @@ class GameState
         Console.log("-------------------------");
      */
     cleanUp() {
-        this.gameObjects.forEach(obj =>
+        this.gameObjects.forEach(function(obj)
         {
-            obj.destroy();
+            if(obj)
+                obj.destroy();
         });
         this.gameObjects = [];
         //mp.vehicles.toArray().forEach(v => v.destroy());

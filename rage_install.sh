@@ -24,7 +24,6 @@ cp -a ./ragemp-PTP/packages/. ragemp-srv/packages
 cp -a ./ragemp-PTP/client_packages/. ragemp-srv/client_packages
 cp -a ./ragemp-PTP/package.json ./ragemp-srv/packages/ptp
 cp -a ./ragemp-PTP/package-lock.json ./ragemp-srv/packages/ptp
-
 cd ragemp-srv/packages/ptp
 npm install
 
