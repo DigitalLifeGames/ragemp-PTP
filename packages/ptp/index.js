@@ -1,3 +1,4 @@
+console.log("here");
 //Process arguments (Debug, Mock mode)
 var debug = false;
 var mock = false;
