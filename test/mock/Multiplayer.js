@@ -1,6 +1,25 @@
-var mp = {
+class EntityPool
+{
+    addCommand(event,callback)
+    {
 
-};
+    }
+    add(event,callback)
+    {
+
+    }
+    forEach()
+    {
+
+    }
+}
+class PlayerPool extends EntityPool
+{
+    broadcast(message)
+    {
+        
+    }
+}
 class Vector3
 {
     constructor(x,y,z)
@@ -39,10 +58,16 @@ function joaat(asset)
     return "hashvalue";
 }
 
+var mp = {
+    events: new EntityPool(),
+    players: new EntityPool()
+};
+
 //Bind methods to object
 mp.Vector3 = Vector3;
 mp.joaat = joaat;
 mp.Player = Player;
 mp.vehicles = new EntityArray();
 mp.blips = new EntityArray();
+mp.players = new PlayerPool();
 module.exports = mp;

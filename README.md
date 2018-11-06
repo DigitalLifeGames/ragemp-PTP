@@ -1,12 +1,12 @@
 # Installation
-This process will install rage-mp and all required dependencies.
+This process will install rage-mp, all required dependencies, aswell as the latest build of PTP.
 ```
 #Prerequisite
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 sudo apt-get install libstdc++6
 
-# Downloading server
+# Downloading RageMP server
 wget https://cdn.rage.mp/lin/ragemp-srv-036.tar.gz</code>
 
 # Extract the server files
@@ -17,8 +17,15 @@ cd ragemp-srv
 
 # Set executable permission
 chmod +x server
+
+# Download latest ptp build
+git clone https://github.com/DigitalLifeGames/ragemp-PTP.git
 ```
 
+# Install PTP dependencies
+cd packages/ptp
+npm install
+echo "PTP installed successfully."
 
 # Run the server
 This will run an instance of the rage-mp server.
@@ -30,6 +37,7 @@ This will run an instance of the rage-mp server.
 ```
 npm install
 ```
+
 
 # Running Tests
 All tests should be ran and pass before build rollouts or any code moves.

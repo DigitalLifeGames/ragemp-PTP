@@ -1,5 +1,6 @@
 var fs = require('fs');
 var util = require('util');
+const path = require("path");
 
 var Colors = {
 	cyan: "\x1b[36m",
@@ -24,10 +25,20 @@ Console.prototype = {
 	opened: false,
 	stream: false,
 
-	open: function(path)
+	options: {
+		log_colors: true
+	},
+
+	open: function(filename,options)
 	{
+		for(var prop in options)
+			this.options[prop] = options[prop];
+		
 		this.opened = true;
-		this.filepath = __dirname + "/" + path;
+		this.filepath =  filename;
+		
+		var dir = path.dirname(this.filepath);
+		if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
 		this.log("Log file opened on [" + this.filepath + "]");
 	},
@@ -36,7 +47,7 @@ Console.prototype = {
 		if(!this.opened)
 			return false;
 
-		fs.appendFile(this.filepath,util.format(line),function (err)
+		fs.appendFile(this.filepath,util.format(line),(err) =>
 		{  
 			if(err)
 			{
@@ -54,7 +65,7 @@ Console.prototype = {
 			color = r;
 
 		process.stdout.write(color + util.format(obj) + r + "\n");
-		this.write(color + util.format(obj) + r + "\n");
+		this.write((this.options.log_colors ? color:``) + util.format(obj) + r + "\n");
 	},
 
 	debug: function(obj)

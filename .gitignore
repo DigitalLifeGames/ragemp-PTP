@@ -3,3 +3,5 @@
 .DS_STORE
 .nyc_output/*
 coverage/*
+packages/ptp/node_modules
+packages/ptp/logs
