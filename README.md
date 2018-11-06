@@ -7,39 +7,46 @@ sudo apt-get update
 sudo apt-get install libstdc++6
 
 # Downloading RageMP server
-wget https://cdn.rage.mp/lin/ragemp-srv-036.tar.gz
+wget https://cdn.rage.mp/lin/ragemp-srv-036.tar.gz</code>
 
 # Extract the server files
 tar -xzf ragemp-srv-036.tar.gz
-rm ragemp-srv-036.tar.gz
+
+# accessing the directory
+cd ragemp-srv
 
 # Set executable permission
-chmod +x ./ragemp-srv/server
+chmod +x server
 
 # Download latest ptp build
-rm -rf ragemp-PTP
 git clone https://github.com/DigitalLifeGames/ragemp-PTP.git
+```
 
-#Copy files over into ptp main folder
-mkdir -p ragemp-srv/packages/ptp
-mkdir -p ragemp-srv/client_packages
-cp -a ./ragemp-PTP/packages/. ragemp-srv/packages
-cp -a ./ragemp-PTP/client_packages/. ragemp-srv/client_packages
-cp -a ./ragemp-PTP/package.json ./ragemp-srv/packages/ptp
-cp -a ./ragemp-PTP/package-lock.json ./ragemp-srv/packages/ptp
-
-cd ragemp-srv/packages/ptp
+# Install PTP dependencies
+cd packages/ptp
 npm install
+echo "PTP installed successfully."
 
 # Run the server
-cd ../../
+This will run an instance of the rage-mp server.
+```
 ./server
+```
 
+# Setting up Development Environment
+```
+npm install
 ```
 
 
 # Running Tests
+First do npm install to set up development evironment
+```
+npm install
+```
+
 All tests should be ran and pass before build rollouts or any code moves.
 ```
 npm test
+npm run mock-server
 ```
