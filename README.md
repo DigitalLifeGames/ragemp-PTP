@@ -33,12 +33,6 @@ This will run an instance of the rage-mp server.
 ./server
 ```
 
-# Setting up Development Environment
-```
-npm install
-```
-
-
 # Running Tests
 First do npm install to set up development evironment
 ```
