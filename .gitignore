@@ -6,3 +6,4 @@ coverage/*
 packages/ptp/node_modules
 packages/ptp/logs/*
 logs/*
+packages/ptp/db_config.json

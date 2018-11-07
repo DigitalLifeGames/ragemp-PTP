@@ -1,28 +1,27 @@
 class EntityPool
 {
-    add(obj)
+    constructor()
     {
-        
+        this._items = [];
     }
     forEach()
     {
 
     }
+    add(entity)
+    {
+        this._items.push(entity);
+        mp.events.simulate("playerJoin",player);
+    }
 }
 class PlayerPool extends EntityPool
 {
-    constructor()
-    {
-        super();
-        this._items = [];
-    }
     broadcast(message)
     {
         
     }
     add(player)
     {
-        this._items.push(player);
         mp.events.simulate("playerJoin",player);
     }
 }
@@ -90,7 +89,7 @@ class Entity
     }
     destroy()
     {
-        
+
     }
 }
 class Player extends Entity
