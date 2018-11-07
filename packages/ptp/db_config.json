@@ -1,7 +1,0 @@
-{
-    "host": "localhost",
-    "username": "ptp-user",
-    "password": "password",
-    "database": "ptp_db",
-    "port": 3306
-}
