@@ -24,7 +24,14 @@ Console.open("logs/" + Date.now() + ".log",{log_colors: false});
 //Create database
 var DatabaseDAO = require("./main/database.js");
 
-var dbConfig = require("./db_config.json");
+var dbConfig = {username: "username",password: "password",host: "localhost",database: "ptp_db"};
+try
+{   
+    dbConfig = require("./db_config.json");
+}catch(e)
+{
+    Console.debug("Could not find database configuration, using default...");
+}
 
 global.Database = new DatabaseDAO(dbConfig,err => {
     if (err)

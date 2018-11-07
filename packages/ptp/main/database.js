@@ -4,8 +4,6 @@ class Database
 {
     constructor(config,callback)
     {
-        Console.log("Initiating database connection...");
-
         var pool = mysql.createConnection({
             host: config.host,
             user: config.username,
