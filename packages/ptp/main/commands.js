@@ -87,3 +87,18 @@ mp.events.addCommand('teams',(player) => {
         player.outputChatBox(`|| ${t.name}: ${t.length} players`);
     });
 });
+mp.events.addCommand('signup',(player,password) => {
+    if(!password || password.length < 6)
+    {
+        player.outputChatBox("Your password must be at least 6 characters.");
+        return;
+    }
+    Database.createAccount({
+        username: player.name,
+        password: password
+    }).then(() => {
+        player.outputChatBox("Account created successfully!");
+    }).catch((error) => {
+        player.outputChatBox(`Your account already exists. Please use /login or /changepassword`);
+    });
+});

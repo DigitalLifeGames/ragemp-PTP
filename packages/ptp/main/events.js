@@ -32,7 +32,15 @@ mp.events.add('playerDeath',(player) =>
 mp.events.add('playerJoin',(player) => {
     console.log(`${player.name} has joined the server.`);
     mp.players.broadcast(`${player.name} has joined the server.`);
-    mp.Game.add(player);
+
+    if(mp.Game.state > 0)
+        mp.Game.add(player);
+    
+    Database.accountExists(player.name).then(() => {
+        player.outputChatBox("Type /login to login");
+    }).catch(() => {
+        player.outputChatBox("Type /signup [password] to create an account!");
+    });
 });
 mp.events.add('playerQuit',(player) => {
     Console.log(`${player.name} has disconnected.`);

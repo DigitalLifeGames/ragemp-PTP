@@ -57,13 +57,13 @@ let Game = require("./main/state.js").GameState;
 
 global.CurrentGame = mp.Game = new Game(preferences);
 
-CurrentGame.start();
+//CurrentGame.start();
 
 
 //Are we mocking
 if(!mock) return;
 
-/*
+
 //Simulate players
 Mock.AddPlayer(new mp.Player("Plornt"));
 Mock.AddPlayer(new mp.Player("Schamens"));
@@ -71,4 +71,12 @@ Mock.AddPlayer(new mp.Player("Tricky"));
 
 Mock.ServerCommand(fcbn("Plornt"),"reset");
 Mock.ServerCommand(fcbn("Tricky"),"move","Terrorist");
-*/
+
+
+Mock.ServerCommand(fcbn("Plornt"),"signup","testpassword");
+
+
+
+setTimeout(() => {
+    Database.close();
+},5000);

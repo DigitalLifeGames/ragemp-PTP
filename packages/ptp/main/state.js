@@ -38,6 +38,7 @@ class GameState
         });
     }
     start() {
+        this.state = 0;
         //Select all players
         mp.players.forEach((player) =>
         {
@@ -96,6 +97,7 @@ class GameState
     teamBalance() {
         var exclude = [];
 
+        var t = this;
         //Autofill all required teams
         this.teams.forEach(team => {
             if(team.length < team.minPlayers)
@@ -109,7 +111,7 @@ class GameState
                         return;
                     }
                     else
-                        this.moveTeam(pl,team);
+                        t.moveTeam(pl,team);
                 }
             }
             exclude.push(team);
@@ -123,21 +125,26 @@ class GameState
         });
 
 
+        var t = this;
         //Gather rest of the players
         this.players.forEach(pl => {
-            if(this.teams.indexOf(this.getTeam(pl)) == -1)
+            if(t.getTeam(pl) != false)
+                return;
+            for(var i=0;i<t.teams.length;i++)
             {
-                this.teams.forEach(t => {
-                    if(t.length == 0)
-                        this.moveTeam(pl,t);
-                });
-                if(this.teams.indexOf(pl.team) != -1)
-                    return;
-                var rTeam = open[Math.floor(open.length * Math.random())];
-                this.moveTeam(pl,rTeam);
-                if(rTeam.maxPlayers != false && rTeam.length >= rTeam.maxPlayers)
-                    open.splice(open.indexOf(rTeam),1);
+                var team = t.teams[i];
+                if(team.length == 0)
+                {
+                    t.moveTeam(pl,team);
+                    break;
+                }
             }
+            if(t.getTeam(pl))
+                return;
+            var rTeam = open[Math.floor(open.length * Math.random())];
+            t.moveTeam(pl,rTeam);
+            if(rTeam.maxPlayers != false && rTeam.length >= rTeam.maxPlayers)
+                open.splice(open.indexOf(rTeam),1);
         });
         
         Console.log("-- Team Balance Report --");
@@ -223,11 +230,6 @@ class GameState
         Console.log("[PTP] " + text);
         this.players.forEach((p) => p.outputChatBox(text));
     }
-    setPresident(player) {
-        Console.log(`${player.name} is now President!`);
-        this.moveTeam(player,President);
-        //this.message("President has spawned");
-    }
     moveTeam(player,team) {
         if(this.getTeam(player))
             this.getTeam(player).splice(this.getTeam(player).indexOf(player),1);
@@ -275,9 +277,12 @@ class GameState
 
     getTeam(player)
     {
+        var t = player.getVariable("currentTeam");
+        if(!t)
+            return false;
         for(var i=0;i<this.teams.length;i++)
         {
-            if(this.teams[i].name == player.getVariable("currentTeam"))
+            if(this.teams[i].name == t)
                 return this.teams[i];
         }
         return false;
@@ -310,7 +315,7 @@ class GameState
         this.players.push(player);
         if(this.state == 1) //waiting to start
             return this.start();
-        
+        if(this.state > 0)
         this.teamBalance();
     }
     remove(player) {

@@ -4,14 +4,22 @@ class EntityPool
     {
         this._items = [];
     }
-    forEach()
+    forEach(callback)
     {
-
+        this._items.forEach((item,i) => callback(item,i));
     }
     add(entity)
     {
         this._items.push(entity);
-        mp.events.simulate("playerJoin",player);
+    }
+    indexOf(entity) {
+        return this._items.indexOf(entity);
+    }
+    get length()
+    {
+        //Fake array
+        this._items.forEach((item,i) => this[i] = item);
+        return this._items.length;
     }
 }
 class PlayerPool extends EntityPool
@@ -22,6 +30,7 @@ class PlayerPool extends EntityPool
     }
     add(player)
     {
+        super.add(player);
         mp.events.simulate("playerJoin",player);
     }
 }
@@ -63,7 +72,7 @@ class EventPool extends EntityPool
         }
         var args = Array.from(arguments);
         args.splice(0,1);
-        this.events[event].forEach(callback => callback.apply(null,args));
+        this.events[event].forEach(callback => callback(...args));
     }
 }
 class Vector3
@@ -102,7 +111,7 @@ class Player extends Entity
 
     removeAllWeapons(){};
     giveWeapon(){}
-    outputChatBox(message){};
+    outputChatBox(message){ Console.log(`[${this.name}] ${message}`)};
     spawn(location){};
 }
 class EntityArray
@@ -118,6 +127,11 @@ class MockServer
     static AddPlayer(player)
     {
         mp.players.add(player);
+    }
+    static ServerCommand(player,cmd,str)
+    {
+        Console.debug(`${player.name}:/${cmd} ${str}`);
+        mp.events.simulate(cmd,player,str);
     }
 }
 
