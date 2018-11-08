@@ -10,37 +10,48 @@ mp.events.add("playerChat",(player, text) => {
     if(text.substring(0,1) == "$")
     {
         var line = text.substring(1);
-        MessageAll("--> " + eval(line));
+
+        global.me = player;
+        var res = eval(line);
+        MessageAll("--> " + res);
+        global.me = undefined;
         return;
     }
+    var name = player.name;
+    if(player.logged)
+        name = "[1] " + name;
     //Check if ptp is running
     if(mp.Game.state > 1 && mp.Game.getTeam(player))
     {
         var prefix = `!{#${mp.Game.getTeam(player).teamColor}}`;
-        MessageAll(`${prefix}${player.name}!{#FFFFFF}: ${text}`);
+        MessageAll(`${prefix}${name}!{#FFFFFF}: ${text}`);
         return;
     }
-    MessageAll(`!{#FFFF00}${player.name}!{#FFFFFF}: ${text}`);
+    MessageAll(`!{#FFFF00}${name}!{#FFFFFF}: ${text}`);
 });
-mp.events.add('playerDeath',(player) =>
+mp.events.add('playerDeath',(player,reason, killer) =>
+{   
+    if(!player.team)
+    {
+        player.call('playerDeath');
+        return;
+    }
+    if (player.respawnTimer) clearTimeout(player.respawnTimer);
+    player.respawnTimer = setTimeout(() => {
+        mp.Game.spawnPlayer(player);
+        clearTimeout(player.respawnTimer);
+        player.respawnTimer = undefined;
+    }, 8000);
+    mp.Game.playerDeath(player,killer);
+});
+
+mp.events.add('playerSpawn',(player) =>
 {
     if(!player.team)
     {
         player.call('playerDeath');
         return;
     }
-    var spawns = player.team.spawns;
-    var spawn = spawns[Math.floor(spawns.length * Math.random())];
-    if(!spawn)
-        spawn = new mp.Vector3(0,0,0);
-    player.spawn(spawn);
-    player.health = 100;
-
-    //Skin
-    var skins = mp.joaat(player.team.skins);
-    var skin = skins[Math.floor(skins.length * Math.random())];
-    console.log(skins[skin],skins);
-    player.model = skins[skin];
 });
 mp.events.add('playerJoin',(player) => {
     console.log(`${player.name} has joined the server.`);

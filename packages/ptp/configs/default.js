@@ -8,6 +8,7 @@ module.exports = {
         name: "President",
         maxPlayers: 1,
         minPlayers: 1,
+        autoAssign: true,
         spawns: [new mp.Vector3(-427,1115,327)],
         blipColor: 70,
         weapons: [{
@@ -54,6 +55,7 @@ module.exports = {
         name: "Vice President",
         maxPlayers: 1,
         minPlayers: 0,
+        autoAssign: false,
         hidden: true,
         spawns: [new mp.Vector3(-427,1110,327)],
         blipColor: 70,
@@ -70,6 +72,7 @@ module.exports = {
         name: "Security",
         maxPlayers: false,
         minPlayers: 0,
+        autoAssign: true,
         spawns: [new mp.Vector3(-422,1213,325)],
         blipColor: 11,
         weapons: [{
@@ -103,6 +106,7 @@ module.exports = {
         name: "Police",
         maxPlayers: false,
         minPlayers: 0,
+        autoAssign: true,
         spawns: [new mp.Vector3(455,-1017,28)],
         blipColor: 3,
         weapons: [{
@@ -154,7 +158,8 @@ module.exports = {
         teamDamageType: "TEAM_TERRORIST",
         name: "Terrorist",
         maxPlayers: false,
-        minPlayers: 0,
+        minPlayers: 1,
+        autoAssign: true,
         spawns: [new mp.Vector3(-497,-2187,8)],
         blipColor: 6,
         weapons: [{

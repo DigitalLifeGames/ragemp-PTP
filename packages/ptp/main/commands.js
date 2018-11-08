@@ -102,3 +102,15 @@ mp.events.addCommand('signup',(player,password) => {
         player.outputChatBox(`Your account already exists. Please use /login or /changepassword`);
     });
 });
+mp.events.addCommand('login',(player,password) => {
+    Database.login({
+        username: player.name,
+        password: password
+    }).then((admin) => {
+        player.outputChatBox("Logged in successfully!");
+        player.logged = true;
+        player.admin = admin;
+    }).catch((error) => {
+        player.outputChatBox(`!{#FF0000}Invalid password.`);
+    });
+});

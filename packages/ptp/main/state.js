@@ -54,24 +54,21 @@ class GameState
         //Clean up
         this.cleanUp();
 
-        //Clear all teams
-        this.teams.forEach((team) => {
-            team.splice(0,team.length);
-
-            //Spawn vehicles
-            team.vehicles.forEach(veh => {
-                try {
-                    this.gameObjects.push(mp.vehicles.new(mp.joaat(veh.datablock), veh.position));
-                } catch(e) {
-                    Console.log("Unhandled error (state.js)");
-                }
-            });
-        });
+        //Spawn objects
+        this.teams.forEach(team => team.vehicles.forEach(veh => {
+            try {
+                this.gameObjects.push(mp.vehicles.new(mp.joaat(veh.datablock), veh.position));
+            } catch(e) {
+                Console.log("Unhandled error (state.js)");
+            }
+        }));
 
         if(this.teamBalance() == false)
         {
-            this.state = 1;
+            if(this.state > 1)
+                this.end();
             MessageAll(`Not enough players to start ptp (${this.players.length}/${this.minPlayers})`);
+            this.state = 1; //waiting now
             return false;
         }
         this.state = 2;
@@ -153,7 +150,7 @@ class GameState
             for(var i=0;i<t.teams.length;i++)
             {
                 var team = t.teams[i];
-                if(team.length == 0)
+                if(team.length == 0 && team.autoAssign != false)
                 {
                     t.moveTeam(pl,team);
                     break;
@@ -235,6 +232,11 @@ class GameState
         Console.log("-------------------------");
      */
     cleanUp() {
+        //Clear all teams
+        this.teams.forEach((team) => {
+            team.forEach(pl => pl.team = undefined);
+            team.splice(0,team.length);
+        });
         this.gameObjects.forEach(function(obj)
         {
             if(obj)
@@ -246,7 +248,6 @@ class GameState
     reset() {
         if(this.state > 1)
             this.end();
-        this.message("Resetting PTP...");
         this.start();
     }
     message(text) {
@@ -260,7 +261,10 @@ class GameState
         player.team = team;
         player.setVariable("currentTeam",team.teamDamageType);
         team.push(player);   
-        player.outputChatBox(`<b>You are now on ${team.name}!</b>`);
+        if(team.maxPlayers === 1)
+            player.outputChatBox(`You are now the !{#${team.teamColor}}${team.name}!{#FFFFFF}!`);
+        else
+            player.outputChatBox(`You are now on !{#${team.teamColor}}${team.name}!{#FFFFFF}!`);
         
         var spawns = team.spawns;
         var spawn = spawns[Math.floor(spawns.length * Math.random())];
@@ -274,14 +278,69 @@ class GameState
             this.createBlip(player);
         }
 
+        mp.Game.spawnPlayer(player);
+
+        
+        // both strings and numbers should work
+        //player.setVariable("currentTeam", player.team);
+    }
+    spawnPlayer(player) {
+        var team = this.getTeam(player);
+        if(!team)
+            return;
+        //Skin
+        var skins = team.skins;
+        var skin = skins[Math.floor(skins.length * Math.random())];
+        player.model = mp.joaat(skin);
+        player.health = 100;
+        player.dimension = 0;
+
+        //Determine spawn point
+        var spawns = team.spawns;
+        var spawnPos = spawns[Math.floor(spawns.length * Math.random())];
+        if(!spawnPos)
+            spawnPos = new mp.Vector3(0,0,0);
+
+        //Respawn player
+        player.spawn(spawnPos);
+        player.dimension = 0;
+        player.health = 100;
+        player.armor = 100;
+        
+
         //Weapons
         player.removeAllWeapons();
         if(team.weapons)
             team.weapons.forEach(wep => {
             player.giveWeapon(mp.joaat(wep.datablock),wep.ammo);
         });
-        // both strings and numbers should work
-        //player.setVariable("currentTeam", player.team);
+    }
+    playerDeath(player,killer) {
+        var team = this.getTeam(player);
+        if(team.name == "President")
+        {
+            //Check for vice president
+            var vp;
+            this.teams.forEach(t => {
+                if(t.name == "Vice President" && t.length > 0)
+                    vp = t[0];
+            });
+            if(vp)
+            {
+                MessageAll(`The !{#FF0000}President !{#FFFFFF}has been killed! The !{#${vp.team.teamColor}}Vice President !{#FFFFFF}has assumed power...`);
+                this.moveTeam(vp,player.team);
+                //Remove team
+                player.team.splice(player.team.indexOf(player),1);
+                player.team = undefined;
+                this.teamBalance();
+            }
+            else
+            {
+                MessageAll("The !{#FF0000}President !{#FFFFFF}has been killed!");
+                this.endRound(killer.team);
+            }
+            return;
+        }
     }
 
     getTeam(player)
@@ -336,7 +395,7 @@ class GameState
             t.splice(t.indexOf(player),1);
         }
         this.players.splice(this.players.indexOf(player),1);
-        if(!this.teamBalance())
+        if(!this.teamBalance() && this.state > 1)
         {
             this.end();
         }
@@ -388,9 +447,20 @@ class GameState
         this.cleanUp();
         
         if(winner)
-        {}
+        {
+            MessageAll(`!{#${winner.teamColor}}${winner.name}!{#FFFFFF} have won!`);
+        }
+
+        if(this.state > 0) //If it was running schedule another...
+        {
+            //Schedule another round
+            var ms = 10000;
+            MessageAll(`Next round scheduled to begin in ${Math.floor(ms/1000)} seconds...`);
+            this.schedule = setTimeout(this.reset.bind(this),ms);
+        }
     }
     end() {
+        this.state = 0;
         this.endRound();
         //Remove all players
         this.players.forEach(pl => {
