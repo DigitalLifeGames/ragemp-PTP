@@ -61,12 +61,12 @@ npm install
 ```
 
 # Development
-First do npm install to set up development evironment
+First do npm install to set up development evironment. This install must be ran in the root github directory.
 ```
 npm install
 ```
 
-All tests should be ran and pass before build rollouts or any code moves. You may also run a mock version of the server.
+All tests should be ran and pass before build rollouts or any code moves. You may also run a mock version of the server. Database integrity tests will be ran if db_config.json is found within the root packages folder.
 ```
 npm test
 npm run mock-server
