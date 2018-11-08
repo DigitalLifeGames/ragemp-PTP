@@ -7,7 +7,20 @@ mp.events.add('playerExitVehicle', (player) => {
     console.log("Dude exited a vehicle");
 });
 mp.events.add("playerChat",(player, text) => {
-    MessageAll(`[${player.name}]: ${text}`);
+    if(text.substring(0,1) == "$")
+    {
+        var line = text.substring(1);
+        MessageAll("--> " + eval(line));
+        return;
+    }
+    //Check if ptp is running
+    if(mp.Game.state > 1 && mp.Game.getTeam(player))
+    {
+        var prefix = `!{#${mp.Game.getTeam(player).teamColor}}`;
+        MessageAll(`${prefix}${player.name}!{#FFFFFF}: ${text}`);
+        return;
+    }
+    MessageAll(`!{#FFFF00}${player.name}!{#FFFFFF}: ${text}`);
 });
 mp.events.add('playerDeath',(player) =>
 {

@@ -3,6 +3,8 @@ module.exports = {
     teams: [
     {
         color: "yellow",
+        teamColor: "FFFF00",
+        teamDamageType: "TEAM_GOVERNMENT",
         name: "President",
         maxPlayers: 1,
         minPlayers: 1,
@@ -47,6 +49,8 @@ module.exports = {
         }]
     },{
         color: "yellow",
+        teamColor: "3333EE",
+        teamDamageType: "TEAM_GOVERNMENT",
         name: "Vice President",
         maxPlayers: 1,
         minPlayers: 0,
@@ -61,6 +65,8 @@ module.exports = {
         skins: ["mp_m_boatstaff_01"]
     },{
         color: "green",
+        teamColor: "00FF00",
+        teamDamageType: "TEAM_GOVERNMENT",
         name: "Security",
         maxPlayers: false,
         minPlayers: 0,
@@ -92,6 +98,8 @@ module.exports = {
         skins: ["s_m_y_blackops_01","ig_casey","s_m_m_highsec_01","s_m_m_highsec02"]
     },{
         color: "blue",
+        teamColor: "0000FF",
+        teamDamageType: "TEAM_GOVERNMENT",
         name: "Police",
         maxPlayers: false,
         minPlayers: 0,
@@ -142,6 +150,8 @@ module.exports = {
         skins: ["s_f_y_cop_01","s_m_y_cop_01","s_m_y_sheriff_01","csb_trafficwarden"]
     },{
         color: "red",
+        teamColor: "FF0000",
+        teamDamageType: "TEAM_TERRORIST",
         name: "Terrorist",
         maxPlayers: false,
         minPlayers: 0,

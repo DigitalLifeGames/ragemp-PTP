@@ -13,7 +13,9 @@ function fcbn(name)
 function MessageAll(msg)
 {
     mp.players.broadcast(msg);
-    Console.log(msg);
+    //Strip colors
+    var clean = msg.replace(/!{#[0-F]*}/g,"");
+    Console.log(clean);
 }
 global.fcbn = fcbn.bind(mp);
 global.MessageAll = MessageAll.bind(mp);

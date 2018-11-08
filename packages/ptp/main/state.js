@@ -29,6 +29,7 @@ class GameState
         this.players = [];
         this.state = 0;
         this.gameObjects = [];
+        this.blips = [];
         options.teams.forEach(t => {
             var team = [];
             for(var prop in t)
@@ -67,25 +68,43 @@ class GameState
             });
         });
 
-        if(this.minPlayers > this.players.length)
+        if(this.teamBalance() == false)
         {
             this.state = 1;
             MessageAll(`Not enough players to start ptp (${this.players.length}/${this.minPlayers})`);
             return false;
         }
-        this.teamBalance();
         this.state = 2;
         Console.log("Protect the President has begun...");
-        this.running = setInterval(this.tick,1000);
+        this.running = setInterval(this.tick.bind(this),1000);
         return true;
     }
     tick() {
+
+        //Update all blips
+        this.players.forEach(player => {
+            var blip = this.getBlip(player);
+            if(blip)
+            {
+                var p = player.position;
+                blip.position = new mp.Vector3(p.x,p.y,p.z);
+            }
+        });
+        return;
         //For every player...
         mp.players.forEach( (player, id) => {
             //Check if his/her blip exists and if they are alive...
-            if (player.blip && player.health > 0) {
+
+            return;
+            if (player.blip && player.blip.position && player.health > 0) {
                 //And update the blip position
-                player.blip.position = player.position;
+                try {
+                    player.blip.position = player.position;
+                } catch(e) {
+                    console.log("Error occured: ",e.message);
+                    console.log("Player: ",player);
+                    player.blip = undefined;
+                }
             
                 //Quick note: The 'player.health > 0' was necessary
                 //because if we dont do that the server just crashes.
@@ -99,23 +118,24 @@ class GameState
 
         var t = this;
         //Autofill all required teams
-        this.teams.forEach(team => {
-            if(team.length < team.minPlayers)
-            {
-                while(team.length < team.minPlayers)
+        try {
+            this.teams.forEach(team => {
+                if(team.length < team.minPlayers)
                 {
-                    var pl = this.random(exclude);
-                    if(!pl)
+                    while(team.length < team.minPlayers)
                     {
-                        Console.log(`Not enough players for team ${team.name}`);
-                        return;
-                    }
-                    else
+                        var pl = this.random(exclude);
+                        if(!pl)
+                            throw new Error(`Not enough players for team ${team.name}`);
                         t.moveTeam(pl,team);
+                    }
                 }
-            }
-            exclude.push(team);
-        });
+                exclude.push(team);
+            });
+        } catch(e) {
+            console.log(e.message);
+            return false;
+        }
 
         //Check teams that have capacity
         var open = [];
@@ -156,6 +176,7 @@ class GameState
         });
         Console.log("-- " + this.gameObjects.length + " objects --")
         Console.log("-------------------------");
+        return true;
     }
     /*   teamBalance() {
         
@@ -223,6 +244,8 @@ class GameState
         //mp.vehicles.toArray().forEach(v => v.destroy());
     }
     reset() {
+        if(this.state > 1)
+            this.end();
         this.message("Resetting PTP...");
         this.start();
     }
@@ -231,10 +254,11 @@ class GameState
         this.players.forEach((p) => p.outputChatBox(text));
     }
     moveTeam(player,team) {
+
         if(this.getTeam(player))
             this.getTeam(player).splice(this.getTeam(player).indexOf(player),1);
         player.team = team;
-        player.setVariable("currentTeam",team.name);
+        player.setVariable("currentTeam",team.teamDamageType);
         team.push(player);   
         player.outputChatBox(`<b>You are now on ${team.name}!</b>`);
         
@@ -243,26 +267,11 @@ class GameState
         player.spawn(spawn);
 
         //Blip
-        if(player.blip)
-        {
-            try {
-            player.blip.destroy();
-            }
-            catch(e) {
-                console.log("Blip Error:",e);
-            }
-            player.blip = undefined;
-        }
+        this.removeBlip(player);
+
         if(team.hidden != false)
         {
-            player.blip = mp.blips.new(1, player.position,
-            {
-                name: player.name,
-                scale: 1,
-                color: team.blipColor,
-                alpha: 255,
-            });
-            this.gameObjects.push(player.blip);
+            this.createBlip(player);
         }
 
         //Weapons
@@ -277,9 +286,11 @@ class GameState
 
     getTeam(player)
     {
-        var t = player.getVariable("currentTeam");
+        //var t = player.getVariable("currentTeam");
+        var t = player.team;
         if(!t)
             return false;
+        return t;
         for(var i=0;i<this.teams.length;i++)
         {
             if(this.teams[i].name == t)
@@ -316,7 +327,7 @@ class GameState
         if(this.state == 1) //waiting to start
             return this.start();
         if(this.state > 0)
-        this.teamBalance();
+            this.teamBalance();
     }
     remove(player) {
         var t = this.getTeam(player);
@@ -325,8 +336,52 @@ class GameState
             t.splice(t.indexOf(player),1);
         }
         this.players.splice(this.players.indexOf(player),1);
-        this.teamBalance();
+        if(!this.teamBalance())
+        {
+            this.end();
+        }
         //if(this.minPlayers > players.length)
+
+        this.removeBlip(player);
+    }
+    createBlip(player) {
+        this.removeBlip(player);
+
+        var p = player.position;
+        var team = this.getTeam(player);
+        if(!team)
+        {
+            console.log(`${player.name} does not have a team, cannot create blip!`);
+            return false;
+        }
+        var blip = mp.blips.new(1, new mp.Vector3(p.x,p.y,p.z),
+        {
+            name: player.name,
+            scale: 1,
+            color: team.blipColor,
+            alpha: 255,
+        });
+        
+        this.blips.push(blip);
+        return blip;
+    }
+    removeBlip(player) {
+        var blip = this.getBlip(player);
+        if(!blip)
+            return true;
+        blip.destroy();
+        this.blips.splice(this.blips.indexOf(blip),1);
+        return true;
+    }
+    getBlip(player) {
+        var blips = this.blips;
+        for(var i=0;i<blips.length;i++)
+        {
+            var blip = this.blips[i];
+            if(blip.name == player.name)
+                return blip;
+        }
+        return false;
     }
     endRound(winner) {
         //Clean up
@@ -340,7 +395,7 @@ class GameState
         //Remove all players
         this.players.forEach(pl => {
             pl.game = undefined;
-            
+            pl.team = undefined;
         });
         MessageAll("Protect the President has ended.");
     }

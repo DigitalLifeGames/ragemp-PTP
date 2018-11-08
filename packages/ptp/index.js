@@ -57,7 +57,7 @@ let Game = require("./main/state.js").GameState;
 
 global.CurrentGame = mp.Game = new Game(preferences);
 
-//CurrentGame.start();
+CurrentGame.start();
 
 
 //Are we mocking
