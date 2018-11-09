@@ -12,10 +12,11 @@ try
 if(!dbConfig)
     return;
 
+var database = new DatabaseDAO(dbConfig);
 //dbConfig.host = "localhost";
 describe('Database Integrity Tests',() => {
     
-    var database = new DatabaseDAO(dbConfig);
+
     var p = database.connect();
     it('Can connect to remote database',() =>
     {
@@ -27,10 +28,13 @@ describe('Database Integrity Tests',() => {
         return database.connect();
     });
     */
-   it('Test account exists',function () {
-
-    return p=database.accountExists("test");
-    });
+   it('Test account exists/create',function () {
+    return p=database.select("accounts",{username: "test"}).catch(() => {
+        return database.createAccount({
+            username: "test",
+            password: "test"
+        });
+    })});
     it('Can log into test user account',function () {
 
         return p=database.login({
@@ -38,7 +42,31 @@ describe('Database Integrity Tests',() => {
             password: "test"
         });
     });
-    setTimeout(() => {
-        database.close();
-    },5000);
+    it('Can add score to test account',function () {
+
+        return p=database.addScore("test",{
+            kills: 1,
+            wins: 1,
+            president: 1
+        });
+    });
+    /*
+    it('Can add vehicle spawn to database',function () {
+
+        return p=database.insert("vehicles",{
+            position: "10 20 30",
+            rotation: 10,
+            datablock: "FIB2"
+        });
+    });
+    */
+    it('Vehicle manifest from database',function () {
+
+        return p=database.select("vehicles",{
+        });
+    });
+    console.log(database.user);
 });
+setTimeout(() => {
+    database.close();
+},5000);

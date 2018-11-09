@@ -30,12 +30,16 @@ class GameState
         this.state = 0;
         this.gameObjects = [];
         this.blips = [];
+        this.round = 1;
+        this.roundLength = options.roundLength*60*1000;
         options.teams.forEach(t => {
             var team = [];
             for(var prop in t)
                 team[prop] = t[prop];
             this.teams.push(team);
             this.minPlayers += t.minPlayers;
+
+            this.teams[team.name] = team;
         });
     }
     start() {
@@ -63,6 +67,20 @@ class GameState
             }
         }));
 
+        //TODO: Move this logic out of database...
+        Database.select("vehicles",{}).then((rows) => {
+            rows.forEach(vehicleData => {
+                var pos = vehicleData.position.split(" ");
+                var rot = vehicleData.rotation.split(" ");
+                var p = new mp.Vector3(pos[0],pos[1],pos[2]);
+                var r = new mp.Vector3(rot[0],rot[1],rot[2]);
+                var v = mp.vehicles.new(vehicleData.datablock,p);
+                v.rotation = r;
+                this.gameObjects.push(v);
+            });
+            Console.debug(`Loaded ${rows.length} vehicles from database.`);
+        });
+
         if(this.teamBalance() == false)
         {
             if(this.state > 1)
@@ -71,9 +89,11 @@ class GameState
             this.state = 1; //waiting now
             return false;
         }
+        this.timeAlerts = 0;
         this.state = 2;
         Console.log("Protect the President has begun...");
         this.running = setInterval(this.tick.bind(this),1000);
+        this.startTime = Date.now();
         return true;
     }
     tick() {
@@ -87,6 +107,27 @@ class GameState
                 blip.position = new mp.Vector3(p.x,p.y,p.z);
             }
         });
+
+        //Check time left
+        var now = Date.now();
+        var progress = (now-this.startTime)/(this.roundLength);
+        if(progress > 1)
+        {
+            this.outOfTime();
+        }
+        else {
+            var left = Math.ceil((this.roundLength-(now-this.startTime))/60/1000);
+            if(left == 5 && this.timeAlerts < 1 && this.timeAlerts != false)
+            {
+                MessageAll(`!{#DDDDDD}${left}!{#FFFFFF} minutes remain!`);
+                this.timeAlerts = 1;
+            }
+            if(left == 10 && this.timeAlerts < 2 && this.timeAlerts != false)
+            {
+                this.timeAlerts = 2;
+                MessageAll(`!{#DDDDDD}${left}!{#FFFFFF} minutes remain!`);
+            }
+        }
         return;
         //For every player...
         mp.players.forEach( (player, id) => {
@@ -109,6 +150,17 @@ class GameState
             }
 	    });
     }
+    outOfTime()
+    {
+        var winner;
+        //President wins
+        this.teams.forEach(t => {
+            if(t.name == "President")
+                winner = t;
+        });
+        MessageAll("!{#CCCCCC}The round has ended! !{#FFFF00}President !{#FFFFFF}has survived!");
+        this.endRound(winner);
+    }
     //Balances the teams, does not rearrange teams
     teamBalance() {
         var exclude = [];
@@ -130,6 +182,7 @@ class GameState
                 exclude.push(team);
             });
         } catch(e) {
+            //console.error(e);
             console.log(e.message);
             return false;
         }
@@ -244,6 +297,8 @@ class GameState
         });
         this.gameObjects = [];
         //mp.vehicles.toArray().forEach(v => v.destroy());
+        clearTimeout(this.schedule);
+        clearTimeout(this.running);
     }
     reset() {
         if(this.state > 1)
@@ -305,7 +360,7 @@ class GameState
         player.spawn(spawnPos);
         player.dimension = 0;
         player.health = 100;
-        player.armor = 100;
+        player.armour = team.armour;
         
 
         //Weapons
@@ -437,7 +492,7 @@ class GameState
         for(var i=0;i<blips.length;i++)
         {
             var blip = this.blips[i];
-            if(blip.name == player.name)
+            if(blip && blip.name == player.name)
                 return blip;
         }
         return false;
@@ -445,23 +500,64 @@ class GameState
     endRound(winner) {
         //Clean up
         this.cleanUp();
+
+        //Make sure game was actually running
+        if(this.state < 2)
+            return;
         
-        if(winner)
+        if(!winner)
         {
-            MessageAll(`!{#${winner.teamColor}}${winner.name}!{#FFFFFF} have won!`);
+            MessageAll(`This round is a draw.`);
         }
+        else if(winner == this.teams.President)
+        {
+            if(winner.length == 0)
+            {
+                console.log("Round ended with no winner");
+                MessageAll("Replicate this :501");
+            }
+            else
+                MessageAll(`!{#FFFF22}${winner[0].name}!{#FFFFFF}, the {#${winner.teamColor}}${winner.name}!{#FFFFFF} has won.`);
+
+            //Government wins
+        }
+        else
+        {
+            MessageAll(`The !{#${this.teams.Terrorist.teamColor}}Terrorists!{#FFFFFF} have won...`);
+
+            //Terrorist wins
+        }
+        this.round++;
+
+        //Apply everyones score
+        this.players.forEach(pl => {
+            if(!pl.kills)
+                pl.kills = 0;
+
+            var team = this.getTeam(pl);
+            var won = winner && team.teamDamageType == winner.teamDamageType;
+            Database.setScore(pl.name,{
+                kills: pl.kills,
+                president: team == president ? 1:0,
+                wins: won ? 1:0,
+                losses: won ? 0:1
+            }).catch(err => {
+                console.log(`Could not update score for user ${pl.name}`);
+            });
+        });
 
         if(this.state > 0) //If it was running schedule another...
         {
             //Schedule another round
             var ms = 10000;
-            MessageAll(`Next round scheduled to begin in ${Math.floor(ms/1000)} seconds...`);
+            MessageAll(`Round !{#FFFF00}${this.round}!{#FFFFFF} is scheduled to begin in ${Math.floor(ms/1000)} seconds...`);
             this.schedule = setTimeout(this.reset.bind(this),ms);
         }
     }
     end() {
         this.state = 0;
         this.endRound();
+        this.schedule = undefined;
         //Remove all players
         this.players.forEach(pl => {
             pl.game = undefined;

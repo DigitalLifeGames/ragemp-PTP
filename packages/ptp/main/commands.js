@@ -114,3 +114,49 @@ mp.events.addCommand('login',(player,password) => {
         player.outputChatBox(`!{#FF0000}Invalid password.`);
     });
 });
+mp.events.addCommand('round',(player) => {
+    var game = mp.Game;
+    var state = game.state;
+    if(state == 0)
+    {
+        player.outputChatBox("Protect the president can be started at any time!");
+    }
+    else if(state == 1)
+        player.outputChatBox("PTP is waiting for more players to join...");
+    else if(state == 2)
+    {
+        var count = game.players.length;
+        var round = game.round;
+        var timems = Math.ceil((game.roundLength-(Date.now()-game.startTime))/60/1000);
+
+        player.outputChatBox(`Round: !{#44FFFF}${round}`);
+        player.outputChatBox(`Time left: !{#44FFFF}${timems} minutes`);
+        player.outputChatBox(`Players: !{#44FFFF}${round}`);
+    }
+});
+mp.events.addCommand('s',(player) => {
+    var veh = player.vehicle;
+    if(!veh)
+    {
+        player.outputChatBox("You are not in a vehicle!");
+        return;
+    }
+    var pos = veh.position;
+    var rot = veh.rotation;
+    var db = veh.model;
+
+    var position = `${pos.x} ${pos.y} ${pos.z}`;
+    var rotation = `${rot.x} ${rot.y} ${rot.z}`;
+
+    try {
+        Database.insert("vehicles",{
+            datablock: db,
+            position: position,
+            rotation: rotation
+        });
+        player.outputChatBox("Added vehicle to database !{#FFFF00}" + db);
+    }
+    catch(e) {
+        player.outputChatBox("Could not add vehicle to database.");
+    }
+});

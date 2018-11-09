@@ -73,10 +73,12 @@ Mock.ServerCommand(fcbn("Plornt"),"reset");
 Mock.ServerCommand(fcbn("Tricky"),"move","Terrorist");
 
 
-Mock.ServerCommand(fcbn("Plornt"),"signup","testpassword");
+//Mock.ServerCommand(fcbn("Plornt"),"signup","testpassword");
+Mock.ServerCommand(fcbn("Plornt"),"round","");
 
 
-
-setTimeout(() => {
+CurrentGame.endRound(CurrentGame.teams.Security);
+setTimeout(function() {
+    CurrentGame.end();
     Database.close();
 },5000);

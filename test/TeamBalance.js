@@ -45,9 +45,10 @@ describe('Team Balance Tests',() => {
         var teams = Game.teams;
         var actual = [teams[0].length,teams[1].length,teams[2].length,teams[3].length,teams[4].length];
 
+        Game.end();
         assert.deepEqual(actual,expected);
     });
-
+    return;
     it('2 Player: President, Terrorist',function () {
 
         var expected = [1,1,0,0,0];

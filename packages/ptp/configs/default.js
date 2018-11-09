@@ -1,4 +1,5 @@
 module.exports = {
+    roundLength: 15,
     //Eventually move config here
     teams: [
     {
@@ -6,6 +7,7 @@ module.exports = {
         teamColor: "FFFF00",
         teamDamageType: "TEAM_GOVERNMENT",
         name: "President",
+        armour: 100,
         maxPlayers: 1,
         minPlayers: 1,
         autoAssign: true,
@@ -53,6 +55,7 @@ module.exports = {
         teamColor: "3333EE",
         teamDamageType: "TEAM_GOVERNMENT",
         name: "Vice President",
+        armour: 100,
         maxPlayers: 1,
         minPlayers: 0,
         autoAssign: false,
@@ -70,6 +73,7 @@ module.exports = {
         teamColor: "00FF00",
         teamDamageType: "TEAM_GOVERNMENT",
         name: "Security",
+        armour: 100,
         maxPlayers: false,
         minPlayers: 0,
         autoAssign: true,
@@ -96,6 +100,9 @@ module.exports = {
         },{
             datablock: 'weapon_grenade',
             ammo: 1000
+        },{
+            datablock: 'weapon_sniperrifle',
+            ammo: 1000
         }],
         vehicles: [],
         skins: ["s_m_y_blackops_01","ig_casey","s_m_m_highsec_01","s_m_m_highsec02"]
@@ -104,6 +111,7 @@ module.exports = {
         teamColor: "0000FF",
         teamDamageType: "TEAM_GOVERNMENT",
         name: "Police",
+        armour: 100,
         maxPlayers: false,
         minPlayers: 0,
         autoAssign: true,
@@ -157,6 +165,7 @@ module.exports = {
         teamColor: "FF0000",
         teamDamageType: "TEAM_TERRORIST",
         name: "Terrorist",
+        armour: 0,
         maxPlayers: false,
         minPlayers: 1,
         autoAssign: true,

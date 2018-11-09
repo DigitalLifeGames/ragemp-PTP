@@ -10,7 +10,7 @@ class Database
             password: config.password
         });
         this.pool = pool;      
-        this.config = config;  
+        this.config = config;
     }
     close()
     {
@@ -27,14 +27,7 @@ class Database
             });
         });
     }
-    query(q,callback)
-    {
-        this.pool.query(q,callback);
-    }
-    select(tbl,callback)
-    {
-        this.pool.query(`SELECT * FROM ${tbl}`, callback);
-    }
+    //TODO: Self creation of tables
     check() //Create the database if it does not exist
     {
         return true;
@@ -52,22 +45,12 @@ class Database
         return false;
     }
 
+    //Users
     login(cred) {
         var tbl = 'accounts';
-        return new Promise((resolve,reject) => {
-        
-            this.pool.query(`SELECT * FROM ${this.config.database}.${tbl} WHERE username='${cred.username}' AND password='${cred.password}'`,(err,rows) => {
-                if(err)
-                {
-                    reject(err);
-                }
-                else if(rows.length == 0)
-                {
-                    reject(new Error("Invalid login credentials"));
-                }
-                else
-                    resolve(rows);
-            });
+        return this.select("accounts",{
+            username: cred.username,
+            password: cred.password
         });
     }
     accountExists(username) {
@@ -89,15 +72,102 @@ class Database
         });
     }
     createAccount(cred) {
-        var tbl = 'accounts';
+        return this.insert("accounts",{
+            username: cred.username,
+            password: cred.password
+        });
+    }
+    addScore(username,score)
+    {
+        //What are we adding
+        return this.select("accounts",{
+            username: username
+        }).then(data => 
+        {
+            return this.select("account_detail",{id: data[0].id})
+        }).then(data => {
+            var row = data[0];
+            //Add it
+            for(var s in row)
+            {
+                if(!isNaN(score[s]))
+                    row[s] += score[s];
+            }
+            return this.update("account_detail",{ id: row.id},row);
+        });
+    }
+    //Main
+    query(q)
+    {
         return new Promise((resolve,reject) => {
-            this.pool.query(`INSERT INTO ${this.config.database}.${tbl} (\`username\`, \`password\`) VALUES ('${cred.username}', '${cred.password}')`,(err,rows) => {
+            this.pool.query(q,(err,data) => {
                 if(err)
-                {
                     reject(err);
-                }
-                resolve();
+                resolve(data);
             });
+        });
+    }
+    insert(tbl,values)
+    {
+        var cols = "";
+        var vals = "";
+        for(var col in values)
+        {
+            var val = values[col];
+            if(cols != "")
+                cols += ",";
+            cols += "\`" + col + "\`";
+
+            if(vals != "")
+                vals += ",";
+            if(isNaN(val))
+                vals += `'${val}'`;
+            else
+                vals += `${val}`;
+        }
+        var q = `INSERT INTO ${this.config.database}.${tbl} (${cols}) VALUES(${vals})`;
+        return this.query(q);
+    }
+    update(tbl,where,values)
+    {
+        if(!where || !values)
+            return Promise.reject();
+        var cols = "";
+        for(var col in values)
+        {
+            if(cols != "")
+                cols += ", ";
+            cols += `${col}='${values[col]}'`;
+        }
+        var w = "";
+        for(var col in where)
+        {
+            if(w != "")
+                w += " AND ";
+            else
+                w = " WHERE ";
+            w += `${col} = '${where[col]}'`;
+        }
+        var q = `UPDATE ${this.config.database}.${tbl} SET ${cols} ${w}`;
+        console.log(q);
+        return this.query(q);
+    }
+    select(tbl,where)
+    {
+        var w = "";
+        for(var col in where)
+        {
+            if(w != "")
+                w += " AND ";
+            else
+                w = " WHERE ";
+            w += `${col} = '${where[col]}'`;
+        }
+        var q = `SELECT * FROM ${this.config.database}.${tbl} ${w}`;
+        return this.query(q).then(rows => {
+            if(rows.length == 0)
+                throw new Error("No rows found");
+            return rows;
         });
     }
 }

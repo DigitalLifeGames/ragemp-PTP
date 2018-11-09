@@ -4,6 +4,8 @@ class EntityPool
     {
         this._items = [];
     }
+    new(a,b,c,d,e,f){return new Entity(a,b,c,d,e,f);}
+
     forEach(callback)
     {
         this._items.forEach((item,i) => callback(item,i));
@@ -79,16 +81,20 @@ class Vector3
 {
     constructor(x,y,z)
     {
-        
+        this.x = isNaN(x) ? 0:x;
+        this.y = isNaN(y) ? 0:y;
+        this.z = isNaN(z) ? 0:z;
     }
 }
 class Entity
 {
     constructor()
-    {
+    { 
+        this.name = "";
         this.data = {
             
         }
+        this.position = new Vector3();
     }
     setVariable(prop,data) {
         this.data[prop] = data;
@@ -144,7 +150,7 @@ var mp = {
 mp.Vector3 = Vector3;
 mp.joaat = joaat;
 mp.Player = Player;
-mp.vehicles = new EntityArray();
+mp.vehicles = new EntityPool();
 mp.blips = new EntityArray();
 mp.players = new PlayerPool();
 mp.events = new EventPool();
