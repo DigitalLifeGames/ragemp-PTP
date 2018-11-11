@@ -167,7 +167,7 @@ module.exports = {
         name: "Terrorist",
         armour: 0,
         maxPlayers: false,
-        minPlayers: 1,
+        minPlayers: 0,
         autoAssign: true,
         spawns: [new mp.Vector3(-497,-2187,8)],
         blipColor: 6,

@@ -54,7 +54,7 @@ mp.events.add('playerSpawn',(player) =>
     }
 });
 mp.events.add('playerJoin',(player) => {
-    console.log(`${player.name} has joined the server.`);
+    Console.log(`${player.name} has joined the server.`);
     mp.players.broadcast(`${player.name} has joined the server.`);
 
     if(mp.Game.state > 0)
@@ -63,7 +63,18 @@ mp.events.add('playerJoin',(player) => {
     Database.accountExists(player.name).then(() => {
         player.outputChatBox("Type /login to login");
     }).catch(() => {
-        player.outputChatBox("Type /signup [password] to create an account!");
+        //Create them an unsecure account
+        Database.createAccount({
+            password: "",
+            username: player.name
+        }).then(() => {
+            player.outputChatBox("Basic account has been created. Type !{#FFFF00}/signup [password]!{#FFFFFF} to add a password! We will begin tracking your stats and activity within the server to provide you the best experience possible.");
+            Console.log(`New player! Created an account for ${player.name}.`);
+        }).catch((err) => {
+            player.outputChatBox("!{#FF2222}An unknown error occured. Try to replicate this and report to an admin.");
+            console.log(`Could not create unsecure account for ${player.name}`);
+            console.error(err);
+        });
     });
 });
 mp.events.add('playerQuit',(player) => {

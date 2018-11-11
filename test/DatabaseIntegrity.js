@@ -28,7 +28,8 @@ describe('Database Integrity Tests',() => {
         return database.connect();
     });
     */
-   it('Test account exists/create',function () {
+   it('Test account exists/create',function ()
+   {
     return p=database.select("accounts",{username: "test"}).catch(() => {
         return database.createAccount({
             username: "test",
@@ -47,7 +48,7 @@ describe('Database Integrity Tests',() => {
         return p=database.addScore("test",{
             kills: 1,
             wins: 1,
-            president: 1
+            president: 1,
         });
     });
     /*

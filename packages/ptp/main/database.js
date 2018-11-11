@@ -72,9 +72,13 @@ class Database
         });
     }
     createAccount(cred) {
+        var locked = 0;
+        if(cred.password.length > 6)
+            locked = 1;
         return this.insert("accounts",{
             username: cred.username,
-            password: cred.password
+            password: cred.password,
+            locked: locked
         });
     }
     addScore(username,score)
@@ -120,7 +124,7 @@ class Database
 
             if(vals != "")
                 vals += ",";
-            if(isNaN(val))
+            if(isNaN(val) || !val)
                 vals += `'${val}'`;
             else
                 vals += `${val}`;
@@ -149,7 +153,6 @@ class Database
             w += `${col} = '${where[col]}'`;
         }
         var q = `UPDATE ${this.config.database}.${tbl} SET ${cols} ${w}`;
-        console.log(q);
         return this.query(q);
     }
     select(tbl,where)

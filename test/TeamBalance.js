@@ -48,6 +48,43 @@ describe('Team Balance Tests',() => {
         Game.end();
         assert.deepEqual(actual,expected);
     });
+    it('should never have same President',function () {
+
+        let Game = new GameState(preferences);
+        Mock.AddPlayer(new mp.Player("Plornt"));
+        Mock.AddPlayer(new mp.Player("Schamens"));
+        Mock.AddPlayer(new mp.Player("Tricky"));
+        Mock.AddPlayer(new mp.Player("Mercury"));
+        Mock.AddPlayer(new mp.Player("Seth"));
+        Mock.AddPlayer(new mp.Player("Paul"));
+        Mock.AddPlayer(new mp.Player("Mike"));
+        Mock.AddPlayer(new mp.Player("Timmy"));
+
+        //Rounds
+        var rounds = 52;
+        for(var i=0;i<rounds;i++)
+        {
+            if(!Game.start())
+                assert.fail("Could not start mock game");
+            Game.endRound(Game.teams.President);
+        }
+        //Make sure president is never the same
+        var presidents = Game.presidentHistory;
+        for(var i=0;i<presidents.length;i++)
+        {
+            var president = presidents[i];
+            if(i > 1)
+            {
+                var last = presidents[i-1];
+                if(president == last) {
+                    assert.fail("Consecutive president found.");
+                    return;
+                }
+            }
+        }
+        assert.equal(1,1);
+        mp.players._items.splice(0,mp.players.length);
+    });
     return;
     it('2 Player: President, Terrorist',function () {
 

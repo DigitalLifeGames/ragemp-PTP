@@ -93,13 +93,20 @@ mp.events.addCommand('signup',(player,password) => {
         player.outputChatBox("Your password must be at least 6 characters.");
         return;
     }
-    Database.createAccount({
+    Database.select("accounts",{
         username: player.name,
-        password: password
+        locked: 0
     }).then(() => {
-        player.outputChatBox("Account created successfully!");
+        player.outputChatBox("Your account already exists. Please use /login or /changepassword!");
     }).catch((error) => {
-        player.outputChatBox(`Your account already exists. Please use /login or /changepassword`);
+        //We can make them an account!
+        return Database.update("accounts",{username: player.name},{
+            locked: 1,
+            password: password
+        });
+    }).catch(err => {
+        player.outputChatBox("Unknown error occured. Could not lock user account.");
+        console.log("Could not lock user account");
     });
 });
 mp.events.addCommand('login',(player,password) => {
