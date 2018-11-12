@@ -33,15 +33,12 @@ describe('Database Integrity Tests',() => {
     return p=database.select("accounts",{username: "test"}).catch(() => {
         return database.createAccount({
             username: "test",
-            password: "test"
+            password: "testpasword"
         });
     })});
     it('Can log into test user account',function () {
 
-        return p=database.login({
-            username: "test",
-            password: "test"
-        });
+        return p=database.login(new mp.Player("test"),"testpassword");
     });
     it('Can add score to test account',function () {
 
@@ -50,6 +47,11 @@ describe('Database Integrity Tests',() => {
             wins: 1,
             president: 1,
         });
+    });
+    it('Can set password for test account',function () {
+
+        var player = new mp.Player("test");
+        return p=Database.setPassword(player.name,"testpassword");
     });
     /*
     it('Can add vehicle spawn to database',function () {

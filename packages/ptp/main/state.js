@@ -57,7 +57,6 @@ class GameState
         this.cleanUp();
         
         if(this.teamBalance() == false) {
-            this.end();
             MessageAll(`Not enough players to start ptp (${this.players.length}/${this.minPlayers})`);
             this.state = 1; //waiting now
             return false;
@@ -86,6 +85,8 @@ class GameState
                     this.gameObjects.push(v);
             });
             Console.debug(`Loaded ${rows.length} vehicles from database.`);
+        }).catch(err => {
+            Console.log("Could not load vehicles from database.");
         });
 
         this.timeAlerts = 0;
@@ -474,13 +475,13 @@ class GameState
     }
     endRound(winner) {
         
-        if(!winner)
+        if(this.state > 1)
         {
-            MessageAll(`This round is a draw.`);
-        }
-        else if(this.state > 1)
-        {
-            if(winner == this.teams.President)
+            if(!winner)
+            {
+                MessageAll(`This round is a draw.`);
+            }
+            else if(winner == this.teams.President)
             {
                 if(winner.length == 0)
                 {

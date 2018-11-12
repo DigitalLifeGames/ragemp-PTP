@@ -63,22 +63,23 @@ CurrentGame.start();
 //Are we mocking
 if(!mock) return;
 
-
+CurrentGame.end();
+Console.log("");
 //Simulate players
 Mock.AddPlayer(new mp.Player("Plornt"));
 Mock.AddPlayer(new mp.Player("Schamens"));
 Mock.AddPlayer(new mp.Player("Tricky"));
 
-Mock.ServerCommand(fcbn("Plornt"),"reset");
-Mock.ServerCommand(fcbn("Tricky"),"move","Terrorist");
+//Mock.ServerCommand(fcbn("Plornt"),"reset");
+//Mock.ServerCommand(fcbn("Tricky"),"move","Terrorist");
 
 
 //Mock.ServerCommand(fcbn("Plornt"),"signup","testpassword");
-Mock.ServerCommand(fcbn("Plornt"),"round","");
+//Mock.ServerCommand(fcbn("Plornt"),"round","");
+Mock.ServerCommand(fcbn("Plornt"),"login","wat");
 
-
-CurrentGame.endRound(CurrentGame.teams.Security);
 setTimeout(function() {
+    CurrentGame.endRound(mp.Game.getTeam(fcbn("Plornt")));
     CurrentGame.end();
     Database.close();
 },5000);

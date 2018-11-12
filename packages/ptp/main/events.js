@@ -45,14 +45,6 @@ mp.events.add('playerDeath',(player,reason, killer) =>
     mp.Game.playerDeath(player,killer);
 });
 
-mp.events.add('playerSpawn',(player) =>
-{
-    if(!player.team)
-    {
-        player.call('playerDeath');
-        return;
-    }
-});
 mp.events.add('playerJoin',(player) => {
     Console.log(`${player.name} has joined the server.`);
     mp.players.broadcast(`${player.name} has joined the server.`);
@@ -60,8 +52,15 @@ mp.events.add('playerJoin',(player) => {
     if(mp.Game.state > 0)
         mp.Game.add(player);
     
-    Database.accountExists(player.name).then(() => {
-        player.outputChatBox("Type /login to login");
+    Database.accountExists(player.name).then((data) => {
+        var acc = data[0];
+        if(acc.locked)
+            player.outputChatBox("Type /login to login");
+        else
+        {
+            player.outputChatBox("Type !{#FFFF00}/signup [password]!{#FFFFFF} to add a password!");
+            player.logged = true;
+        }
     }).catch(() => {
         //Create them an unsecure account
         Database.createAccount({
@@ -69,6 +68,7 @@ mp.events.add('playerJoin',(player) => {
             username: player.name
         }).then(() => {
             player.outputChatBox("Basic account has been created. Type !{#FFFF00}/signup [password]!{#FFFFFF} to add a password! We will begin tracking your stats and activity within the server to provide you the best experience possible.");
+            player.logged = true;
             Console.log(`New player! Created an account for ${player.name}.`);
         }).catch((err) => {
             player.outputChatBox("!{#FF2222}An unknown error occured. Try to replicate this and report to an admin.");
@@ -78,6 +78,6 @@ mp.events.add('playerJoin',(player) => {
     });
 });
 mp.events.add('playerQuit',(player) => {
-    Console.log(`${player.name} has disconnected.`);
+    MessageAll(`!{#FFFF00}${player.name} !{#FFFFFF}has disconnected.`);
     mp.Game.remove(player);
 });

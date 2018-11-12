@@ -46,29 +46,37 @@ class Database
     }
 
     //Users
-    login(cred) {
+    login(playerObj,password) {
         var tbl = 'accounts';
-        return this.select("accounts",{
-            username: cred.username,
-            password: cred.password
+        var username = playerObj.name;
+        var p = this.select("accounts",{
+            username: username,
+            password: password,
+            locked: 1
         });
+        p.then((data) => {
+            var acc = data[0];
+            playerObj.logged = true;
+            if(acc.admin)
+            {
+                playerObj.admin = true;
+                Console.log(`[ADMIN] login by ${username}.`);
+            }
+            else
+                Console.log(`Login by ${username}.`);
+            return Promise.resolve(data);
+        }).catch(() => {
+           
+        });
+        return p;
+    }
+    isLogged(player) {
+        return player.logged;
     }
     accountExists(username) {
         var tbl = 'accounts';
-        return new Promise((resolve,reject) => {
-        
-            this.pool.query(`SELECT id FROM ${this.config.database}.${tbl} WHERE username='${username}'`,(err,rows) => {
-                if(err)
-                {
-                    reject(err);
-                }
-                else if(rows.length == 0)
-                {
-                    reject(new Error("Account with username does not exist"));
-                }
-                else
-                    resolve(rows);
-            });
+        return this.select('accounts',{
+            username: username
         });
     }
     createAccount(cred) {
@@ -79,6 +87,15 @@ class Database
             username: cred.username,
             password: cred.password,
             locked: locked
+        });
+    }
+    setPassword(username,password)
+    {
+        if(password.length < 4)
+            return Promise.reject(new Error("Password does not meet requirements"));
+        return this.update("accounts",{username: username},{
+            locked: 1,
+            password: password
         });
     }
     addScore(username,score)
@@ -97,7 +114,11 @@ class Database
                 if(!isNaN(score[s]))
                     row[s] += score[s];
             }
-            return this.update("account_detail",{ id: row.id},row);
+            var p = this.update("account_detail",{ id: row.id},row); 
+            p.then(data => {
+                Console.log(`Successfully updated score for ${row.username}`);
+            });
+            return p;
         });
     }
     //Main

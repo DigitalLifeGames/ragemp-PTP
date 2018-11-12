@@ -1,5 +1,12 @@
 mp.events.addCommand('veh', (player, _, vehName) => {
-    mp.vehicles.new(mp.joaat(vehName), player.position);
+    if(player.admin)
+    {
+        var v = mp.vehicles.new(mp.joaat(vehName), player.position);
+        mp.Game.gameObjects.push(v);
+        player.outputChatBox(`!{#00FF00}Vehicle spawned!`);
+    }
+    else
+        player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
 });
 mp.events.addCommand('pos', (player) => {
     var x = player.position.x;
@@ -84,41 +91,59 @@ mp.events.addCommand('move',(player,str) => {
 });
 mp.events.addCommand('teams',(player) => {
     mp.Game.teams.forEach(t => {
-        player.outputChatBox(`|| ${t.name}: ${t.length} players`);
+        player.outputChatBox(`|| !{#${t.teamColor}}${t.name}!{#FFFFFF}: ${t.length} players`);
     });
 });
 mp.events.addCommand('signup',(player,password) => {
-    if(!password || password.length < 6)
+    if(!password || password.length < 4)
     {
-        player.outputChatBox("Your password must be at least 6 characters.");
+        player.outputChatBox("!{#FF0000}Your password must be at least 4 characters.");
         return;
     }
     Database.select("accounts",{
         username: player.name,
-        locked: 0
+        locked: 1
     }).then(() => {
         player.outputChatBox("Your account already exists. Please use /login or /changepassword!");
     }).catch((error) => {
         //We can make them an account!
-        return Database.update("accounts",{username: player.name},{
-            locked: 1,
-            password: password
-        });
+        return Database.setPassword(player.name,password);
     }).catch(err => {
         player.outputChatBox("Unknown error occured. Could not lock user account.");
         console.log("Could not lock user account");
     });
 });
 mp.events.addCommand('login',(player,password) => {
-    Database.login({
-        username: player.name,
-        password: password
-    }).then((admin) => {
-        player.outputChatBox("Logged in successfully!");
+    Database.login(player,password).then((data) => {
+        var acc = data[0];
         player.logged = true;
-        player.admin = admin;
+        player.admin = acc.admin;
+        player.outputChatBox(`${acc.admin ? "!{#00FF00}[Admin]!{#FFFFFF} ":""}Logged in successfully!`);
+
     }).catch((error) => {
-        player.outputChatBox(`!{#FF0000}Invalid password.`);
+        player.outputChatBox(`!{#FF0000}Invalid password/Username not found.`);
+    });
+});
+mp.events.addCommand('changepassword',(player,password) => {
+    if(!Database.isLogged(player))
+    {
+        player.outputChatBox(`!{#FF0000}You are not currently logged in. Please use !{#FFFF00}/login`);
+        return;
+    }
+    if(!password || password.length < 4)
+    {
+        player.outputChatBox("!{#FF0000}Your password must be at least 4 characters.");
+        return;
+    }
+    Database.update('accounts',{
+        username: player.name,
+    },{
+        password: password
+    }).then(() => {
+        player.outputChatBox(`!{#00FF00}Password updated successfully!`);
+    }).catch(() => {
+        player.outputChatBox("!{#FF0000}Unknown error occured. Could not update password for account.");
+        console.log("Could not update password for account.");
     });
 });
 mp.events.addCommand('round',(player) => {
@@ -138,7 +163,7 @@ mp.events.addCommand('round',(player) => {
 
         player.outputChatBox(`Round: !{#44FFFF}${round}`);
         player.outputChatBox(`Time left: !{#44FFFF}${timems} minutes`);
-        player.outputChatBox(`Players: !{#44FFFF}${round}`);
+        player.outputChatBox(`Players: !{#44FFFF}${count}`);
     }
 });
 mp.events.addCommand('s',(player) => {
