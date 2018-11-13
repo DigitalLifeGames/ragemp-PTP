@@ -116,7 +116,7 @@ class Database
             }
             var p = this.update("account_detail",{ id: row.id},row); 
             p.then(data => {
-                Console.log(`Successfully updated score for ${row.username}`);
+                Console.log(`Successfully updated score for ${username}`);
             });
             return p;
         });
@@ -191,6 +191,24 @@ class Database
         return this.query(q).then(rows => {
             if(rows.length == 0)
                 throw new Error("No rows found");
+            return rows;
+        });
+    }
+    delete(tbl,where)
+    {
+        var w = "";
+        for(var col in where)
+        {
+            if(w != "")
+                w += " AND ";
+            else
+                w = " WHERE ";
+            w += `${col} = '${where[col]}'`;
+        }
+        var q = `DELETE FROM ${this.config.database}.${tbl} ${w}`;
+        return this.query(q).then(rows => {
+            if(rows.length == 0)
+                throw new Error("No rows removed");
             return rows;
         });
     }

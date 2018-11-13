@@ -75,14 +75,22 @@ class GameState
             rows.forEach(vehicleData => {
                 var pos = vehicleData.position.split(" ");
                 var rot = vehicleData.rotation.split(" ");
-                var p = new mp.Vector3(pos[0],pos[1],pos[2]);
+                var p = new mp.Vector3(Math.floor(pos[0]),Math.floor(pos[1]),Math.floor(pos[2]));
                 var r = new mp.Vector3(rot[0],rot[1],rot[2]);
-                var v = mp.vehicles.new(vehicleData.datablock,p);
+
+                var hash = parseInt(vehicleData.datablock);
+                if(isNaN(hash))
+                    hash = mp.joaat(vehicleData.datablock);
+                var v = mp.vehicles.new(hash,p);
                 v.rotation = r;
+                v.position = p;
                 if(!v)
                     Console.log(`Could not create vehicle entity for datablock [${vehicleData.datablock}]`);
                 else
+                {
+                    v.databaseId = vehicleData.id;
                     this.gameObjects.push(v);
+                }
             });
             Console.debug(`Loaded ${rows.length} vehicles from database.`);
         }).catch(err => {
@@ -92,12 +100,18 @@ class GameState
         this.timeAlerts = 0;
         this.state = 2;
         Console.log("Protect the President has begun...");
-        this.running = setInterval(this.tick.bind(this),1000);
+        clearTimeout(this.running);
+        this.running = setInterval(this.tick.bind(this),100);
         this.startTime = Date.now();
         return true;
     }
     tick() {
-
+        if(this.state < 1) //Not running or waiting?
+        {
+            //This should never get called. remove this and make sure it doesn't get called
+            clearTimeout(this.running);
+            return;
+        }
         //Update all blips
         this.players.forEach(player => {
             var blip = this.getBlip(player);
@@ -263,9 +277,14 @@ class GameState
         return true;
     }
     cleanUp() {
+        clearTimeout(this.schedule);
+        clearTimeout(this.running);
         //Clear all teams
         this.teams.forEach((team) => {
-            team.forEach(pl => pl.team = undefined);
+            team.forEach(pl => {
+                pl.team = undefined
+                pl.kills = 0;
+            });
             team.splice(0,team.length);
         });
         this.gameObjects.forEach(function(obj)
@@ -275,8 +294,6 @@ class GameState
         });
         this.gameObjects = [];
         //mp.vehicles.toArray().forEach(v => v.destroy());
-        clearTimeout(this.schedule);
-        clearTimeout(this.running);
     }
     reset() {
         if(this.state > 1)
@@ -330,8 +347,8 @@ class GameState
         //Add variance to spawn position
         var radius = (x) => Math.floor(x*2*Math.random())-x;
 
-        spawnPos.x += radius(5);
-        spawnPos.y += radius(5);
+        spawnPos.x += radius(100)/100;
+        spawnPos.y += radius(100)/100;
         
 
         //Respawn player
@@ -349,7 +366,13 @@ class GameState
         });
     }
     playerDeath(player,killer) {
+        if(!killer)
+            killer = player;
+        else
+            killer.kills++;
         var team = this.getTeam(player);
+        var enemy = this.getTeam(killer);
+        MessageAll(`!{#${enemy.teamColor}}${killer.name}!{#FF0000} killed !{#${team.teamColor}}${player.name} `);
         if(team.name == "President")
         {
             //Check for vice president
@@ -370,7 +393,7 @@ class GameState
             else
             {
                 MessageAll("The !{#FF0000}President !{#FFFFFF}has been killed!");
-                this.endRound(killer.team);
+                this.endRound(this.teams.Terrorist);
             }
             return;
         }
@@ -413,6 +436,7 @@ class GameState
     add(player) {
         if(this.players.indexOf(player) != -1)
             return;
+        player.kills = 0;
         this.players.push(player);
         if(this.state == 1) //waiting to start
             return this.start();
@@ -430,7 +454,7 @@ class GameState
         {
             this.end();
         }
-        //if(this.minPlayers > players.length)
+        
 
         this.removeBlip(player);
     }
@@ -522,7 +546,8 @@ class GameState
                 kills: pl.kills,
                 president: team == this.teams.President ? 1:0,
                 wins: won ? 1:0,
-                losses: won ? 0:1
+                losses: won ? 0:1,
+                rounds: 1
             };
             Database.addScore(pl.name,score).catch(err => {
                 console.log(`Could not update score for user ${pl.name}`);

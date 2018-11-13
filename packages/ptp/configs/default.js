@@ -4,7 +4,7 @@ module.exports = {
     teams: [
     {
         color: "yellow",
-        teamColor: "FFFF00",
+        teamColor: "DDDD22",
         teamDamageType: "TEAM_GOVERNMENT",
         name: "President",
         armour: 100,
@@ -167,7 +167,7 @@ module.exports = {
         name: "Terrorist",
         armour: 0,
         maxPlayers: false,
-        minPlayers: 0,
+        minPlayers: 1,
         autoAssign: true,
         spawns: [new mp.Vector3(-497,-2187,8)],
         blipColor: 6,

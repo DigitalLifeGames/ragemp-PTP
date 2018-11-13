@@ -15,10 +15,12 @@ mp.events.addCommand('pos', (player) => {
     player.outputChatBox(`Position: ${x},${y},${z}`);
 });
 mp.events.addCommand('cleanup', (player) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     mp.players.broadcast(`There are ${mp.Game.gameObjects.length} objects spawned.`);
     mp.Game.cleanUp();
 });
 mp.events.addCommand('tp',(player,location) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     var target = mp.fcbn(location);
     if(target)
     {
@@ -41,11 +43,13 @@ mp.events.addCommand('kill',(player) => {
     player.health = 0;
     player.spawn();
 });
-mp.events.addCommand('reset',() =>
+mp.events.addCommand('reset',(player) =>
 {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     mp.Game.reset();
 });
 mp.events.addCommand('reload',(player,config) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     //New game
     if(!config)
         config = "default";
@@ -58,6 +62,7 @@ mp.events.addCommand('reload',(player,config) => {
     mp.Game.start();
 });
 mp.events.addCommand('move',(player,str) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     var args = str.split(" ");
     var team;
     var targetName = args[0];
@@ -86,8 +91,10 @@ mp.events.addCommand('move',(player,str) => {
         player.outputChatBox(`Could not find team '${team}'`);
         return;
     }
-        mp.Game.moveTeam(target,real);
-    target.outputChatBox(`Moved to team ${real.name}`);
+    mp.Game.moveTeam(target,real);
+    if(player != target)
+        player.outputChatBox(`Moved !{#FFFF00}${target.name}!{#FFFFFF} to team !{#${real.teamColor}}${real.name}`);
+    target.outputChatBox(`!{#FFFF00}${player.name}!{#FFFFFF} moved you to team !{#${real.teamColor}}${real.name}`);
 });
 mp.events.addCommand('teams',(player) => {
     mp.Game.teams.forEach(t => {
@@ -166,7 +173,8 @@ mp.events.addCommand('round',(player) => {
         player.outputChatBox(`Players: !{#44FFFF}${count}`);
     }
 });
-mp.events.addCommand('s',(player) => {
+mp.events.addCommand('s',(player,saveteam) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
     var veh = player.vehicle;
     if(!veh)
     {
@@ -177,18 +185,42 @@ mp.events.addCommand('s',(player) => {
     var rot = veh.rotation;
     var db = veh.model;
 
-    var position = `${pos.x} ${pos.y} ${pos.z}`;
-    var rotation = `${rot.x} ${rot.y} ${rot.z}`;
+    var position = `${Math.floor(pos.x)} ${Math.floor(pos.y)} ${Math.floor(pos.z)}`;
+    var rotation = `${Math.floor(rot.x*100)/100} ${Math.floor(rot.y*100)/100} ${Math.floor(rot.z*100)/100}`;
 
-    try {
-        Database.insert("vehicles",{
-            datablock: db,
-            position: position,
-            rotation: rotation
-        });
-        player.outputChatBox("Added vehicle to database !{#FFFF00}" + db);
-    }
-    catch(e) {
+    var team = undefined;
+    if(saveteam && mp.Game.getTeam(player))
+        team = mp.Game.getTeam(player).name;
+    Database.insert("vehicles",{
+        datablock: db,
+        position: position,
+        rotation: rotation,
+        team: team
+    }).then(() => {
+        player.outputChatBox(`Added vehicle to database !{#FFFF00}${db}!{#FFFFFF}. ${team != undefined ? `For team: !{#${mp.Game.getTeam(player).teamColor}}${team}`:""}`);
+    }).catch(() => {
         player.outputChatBox("Could not add vehicle to database.");
+    });
+});
+mp.events.addCommand('d',(player) => {
+    if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
+    var veh = player.vehicle;
+    if(!veh)
+    {
+        player.outputChatBox("You are not in a vehicle!");
+        return;
     }
+    if(!veh.databaseId)
+    {
+        player.outputChatBox("We do not have a record of this vehicle in the database!");
+        return;   
+    }
+    Database.delete("vehicles",{
+        id: veh.databaseId
+    }).then(() => {
+        player.outputChatBox(`Removed vehicle from database. ID: !{#FFFF00}${veh.databaseId}`);
+        veh.databaseId = undefined;
+    }).catch(() => {
+        player.outputChatBox(`!{#FF0000}Could not removed vehicle from database. ID: !{#FFFF00}${veh.databaseId}`);
+    });
 });
