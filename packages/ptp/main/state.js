@@ -513,7 +513,7 @@ class GameState
                     MessageAll("Replicate this :501");
                 }
                 else
-                    MessageAll(`!{#FFFF22}${winner[0].name}!{#FFFFFF}, the {#${winner.teamColor}}${winner.name}!{#FFFFFF} has won.`);
+                    MessageAll(`!{#FFFF22}${winner[0].name}!{#FFFFFF}, the !{#${winner.teamColor}}${winner.name}!{#FFFFFF} has won.`);
 
                 //Government wins
             }
