@@ -1,6 +1,3 @@
-//let Preferences = require('./main/preferences.js');
-let SpawnPoints = require('./models/SpawnPoints.js').SpawnPoints;
-
 mp.events.add('playerExitVehicle', (player) => {
     player.call('playerExitVehicle');
     //player.outputChatbox("Left vehicle");

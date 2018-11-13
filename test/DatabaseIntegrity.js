@@ -16,10 +16,11 @@ var database = new DatabaseDAO(dbConfig);
 //dbConfig.host = "localhost";
 describe('Database Integrity Tests',() => {
     
-
+    var tests = [];
     var p = database.connect();
     it('Can connect to remote database',() =>
     {
+        tests.push(p);
         return p;
     });
     /*
@@ -30,28 +31,30 @@ describe('Database Integrity Tests',() => {
     */
    it('Test account exists/create',function ()
    {
-    return p=database.select("accounts",{username: "test"}).catch(() => {
+        var t = p.then(() => database.select("accounts",{username: "test"}).catch(() => {
         return database.createAccount({
             username: "test",
             password: "testpasword"
         });
-    })});
+        tests.push(p);
+        return t;
+    }))});
     it('Can log into test user account',function () {
 
-        return p=database.login(new mp.Player("test"),"testpassword");
+        return p.then(() => database.login(new mp.Player("test"),"testpassword"));
     });
     it('Can add score to test account',function () {
 
-        return p=database.addScore("test",{
+        return p.then(() => database.addScore("test",{
             kills: 1,
             wins: 1,
             president: 1,
-        });
+        }));
     });
     it('Can set password for test account',function () {
 
         var player = new mp.Player("test");
-        return p=Database.setPassword(player.name,"testpassword");
+        return p.then(() => Database.setPassword(player.name,"testpassword"));
     });
     /*
     it('Can add vehicle spawn to database',function () {
@@ -65,11 +68,10 @@ describe('Database Integrity Tests',() => {
     */
     it('Vehicle manifest from database',function () {
 
-        return p=database.select("vehicles",{
-        });
+        return p.then(() => database.select("vehicles",{
+        }));
     });
-    console.log(database.user);
+    Promise.all(tests).then( ()=> {
+        database.close();
+    });
 });
-setTimeout(() => {
-    database.close();
-},5000);

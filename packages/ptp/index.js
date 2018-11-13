@@ -21,18 +21,16 @@ require("./main/models/Multiplayer.js");
 Console = require("./main/models/Logger.js").Console;
 Console.open("logs/" + Date.now() + ".log",{log_colors: false});
 
-//Create database
 var DatabaseDAO = require("./main/database.js");
+var ServiceDAO = require("./service/main.js");
 
+//Create database
 var dbConfig = {username: "username",password: "password",host: "localhost",database: "ptp_db"};
-try
-{   
+try {   
     dbConfig = require("./db_config.json");
-}catch(e)
-{
+} catch(e) {
     Console.debug("Could not find database configuration, using default...");
 }
-
 global.Database = new DatabaseDAO(dbConfig,err => {
     if (err)
     {
@@ -42,23 +40,22 @@ global.Database = new DatabaseDAO(dbConfig,err => {
     }
     Console.log("Connected to the database");
 });
-
 Database.check();
 
-// Init events.
+// Init commands/events.
 require('./main/events.js');
-// Init commands.
 require('./main/commands.js');
 // Init Preferences
 var preferences = require("./configs/default.js");
 
 
 let Game = require("./main/state.js").GameState;
-
 global.CurrentGame = mp.Game = new Game(preferences);
-
 CurrentGame.start();
 
+//Create PTPService
+global.Service = new ServiceDAO();
+Service.start();
 
 //Are we mocking
 if(!mock) return;
