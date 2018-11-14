@@ -4,9 +4,9 @@ mp = require("./mock/Multiplayer.js");
 var GameState = require("../packages/ptp/main/state.js").GameState;
 var preferences = require("../packages/ptp/configs/default.js");
 
-
 //Disable logging
 Console.log = () => {}
+global.Database = undefined;
 describe('Team Balance Tests',() => {
     
     it('1 Player: Doesn\'t start',function () {
@@ -51,17 +51,17 @@ describe('Team Balance Tests',() => {
     it('should never have same President',function () {
 
         let Game = new GameState(preferences);
-        Mock.AddPlayer(new mp.Player("Plornt"));
-        Mock.AddPlayer(new mp.Player("Schamens"));
-        Mock.AddPlayer(new mp.Player("Tricky"));
-        Mock.AddPlayer(new mp.Player("Mercury"));
-        Mock.AddPlayer(new mp.Player("Seth"));
-        Mock.AddPlayer(new mp.Player("Paul"));
-        Mock.AddPlayer(new mp.Player("Mike"));
-        Mock.AddPlayer(new mp.Player("Timmy"));
-
+        
+        Game.add(new mp.Player("Plornt"));
+        Game.add(new mp.Player("Schamens"));
+        Game.add(new mp.Player("Tricky"));
+        Game.add(new mp.Player("Mercury"));
+        Game.add(new mp.Player("Seth"));
+        Game.add(new mp.Player("Paul"));
+        Game.add(new mp.Player("Mike"));
+        Game.add(new mp.Player("Timmy"));
         //Rounds
-        var rounds = 52;
+        var rounds = 5;
         for(var i=0;i<rounds;i++)
         {
             if(!Game.start())
@@ -82,8 +82,10 @@ describe('Team Balance Tests',() => {
                 }
             }
         }
+        Game.state = 0;
+        Game.end();
         assert.equal(1,1);
-        mp.players._items.splice(0,mp.players.length);
+        //mp.players._items.splice(0,mp.players.length);
     });
     return;
     it('2 Player: President, Terrorist',function () {

@@ -71,7 +71,8 @@ class GameState
             }
         }));
         //TODO: Move this logic out of database...
-        Database.select("vehicles",{}).then((rows) => {
+        if(Database)
+            Database.select("vehicles",{}).then((rows) => {
             rows.forEach(vehicleData => {
                 var pos = vehicleData.position.split(" ");
                 var rot = vehicleData.rotation.split(" ");
@@ -101,6 +102,7 @@ class GameState
         this.state = 2;
         Console.log("Protect the President has begun...");
         clearTimeout(this.running);
+        clearInterval(this.running);
         this.running = setInterval(this.tick.bind(this),100);
         this.startTime = Date.now();
         return true;
@@ -110,6 +112,7 @@ class GameState
         {
             //This should never get called. remove this and make sure it doesn't get called
             clearTimeout(this.running);
+            clearInterval(this.running);
             return;
         }
         //Update all blips
@@ -277,8 +280,8 @@ class GameState
         return true;
     }
     cleanUp() {
-        clearTimeout(this.schedule);
         clearTimeout(this.running);
+        clearInterval(this.running);
         //Clear all teams
         this.teams.forEach((team) => {
             team.forEach(pl => {
@@ -549,7 +552,9 @@ class GameState
                 losses: won ? 0:1,
                 rounds: 1
             };
-            Database.addScore(pl.name,score).catch(err => {
+
+            if(Database)
+                Database.addScore(pl.name,score).catch(err => {
                 console.log(`Could not update score for user ${pl.name}`);
             });
         });
@@ -562,12 +567,15 @@ class GameState
             //Schedule another round
             var ms = 10000;
             MessageAll(`Round !{#FFFF00}${this.round}!{#FFFFFF} is scheduled to begin in ${Math.floor(ms/1000)} seconds...`);
-            this.schedule = setTimeout(this.reset.bind(this),ms);
+            clearInterval(this.running);
+            this.running = setInterval(this.reset.bind(this),ms);
         }
     }
     end() {
         this.state = 0;
         this.endRound();
+        clearInterval(this.running);
+        clearTimeout(this.running);
         this.schedule = undefined;
         //Remove all players
         this.players.forEach(pl => {
@@ -576,5 +584,6 @@ class GameState
         });
         MessageAll("Protect the President has ended.");
     }
+    
 }
 module.exports.GameState = GameState;

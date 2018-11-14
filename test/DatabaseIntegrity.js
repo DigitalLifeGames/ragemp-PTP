@@ -31,32 +31,45 @@ describe('Database Integrity Tests',() => {
     */
    it('Test account exists/create',function ()
    {
-        var t = p.then(() => database.select("accounts",{username: "test"}).catch(() => {
-        return database.createAccount({
-            username: "test",
-            password: "testpasword"
-        });
+        var t = p.then(() => database.select("accounts",{username: "test"}).catch(() =>
+        {
+            var t = database.createAccount({
+                username: "test",
+                password: "testpasword"
+            });
+            tests.push(t);
+            return t;
+        }));
         tests.push(p);
         return t;
-    }))});
+    });
     it('Can log into test user account',function () {
 
-        return p.then(() => database.login(new mp.Player("test"),"testpassword"));
+        var t = p.then(() => database.login(new mp.Player("test"),"testpassword"));
+        tests.push(t);
+        return t;
     });
     it('Can add score to test account',function () {
 
-        return p.then(() => database.addScore("test",{
+        var t = p.then(() => database.addScore("test",{
             kills: 1,
             wins: 1,
             president: 1,
         }));
+        tests.push(t);
+        return t;
     });
     it('Can set password for test account',function () {
 
         var player = new mp.Player("test");
-        return p.then(() => Database.setPassword(player.name,"testpassword"));
+        var t = p.then(() => {
+            var t = database.setPassword(player.name,"testpassword");
+            tests.push(t);
+            return t;
+        });
+        tests.push(t);
+        return t;
     });
-    /*
     it('Can add vehicle spawn to database',function () {
 
         return p=database.insert("vehicles",{
@@ -65,13 +78,14 @@ describe('Database Integrity Tests',() => {
             datablock: "FIB2"
         });
     });
-    */
     it('Vehicle manifest from database',function () {
-
-        return p.then(() => database.select("vehicles",{
+        var t = p.then(() => database.select("vehicles",{
         }));
+        return t;
     });
     Promise.all(tests).then( ()=> {
-        database.close();
+        setTimeout(function () {
+            database.close();
+        },500);
     });
 });

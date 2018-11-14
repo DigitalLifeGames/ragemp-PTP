@@ -32,7 +32,7 @@ class PlayerPool extends EntityPool
     }
     add(player)
     {
-        super.add(player);
+        this._items.push(player);
         mp.events.simulate("playerJoin",player);
     }
 }

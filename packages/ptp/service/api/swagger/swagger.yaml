@@ -1,0 +1,104 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Active PTP Service
+# during dev, should point to your local machine
+host: 198.12.64.182:3000
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the resp111111onses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /server/players:
+    x-swagger-router-controller: server_global
+    get:
+      tags:
+        - Server Operations
+      description: Returns array of players currently within the server
+      # used as the method name of the controller
+      operationId: players
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            type: array
+            items:
+              $ref: '#/definitions/Player'
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /server/time:
+    x-swagger-router-controller: server_global
+    get:
+      tags:
+      - Server Operations
+      description: Returns integer of the current run time (ms) of the server
+      # used as the method name of the controller
+      operationId: time
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            type: integer
+  /ptp/state:
+    x-swagger-router-controller: ptp_minigame
+    get:
+      tags:
+        - Minigame Operations
+      description: Returns current state of the PTP minigame
+      # used as the method name of the controller
+      operationId: state
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/StateResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have÷   schema definitions
+definitions:
+  Player:
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      ip:
+        type: string
+      admin:
+        type: boolean
+      logged:
+        type: boolean
+  StateResponse:
+    required:
+      - message
+      - code
+    properties:
+      message:
+        type: string
+      code:
+        type: "integer"
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
