@@ -27,7 +27,6 @@
     "swagger-express-mw": "^0.7.0"
   },
   "devDependencies": {
-    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#master",
     "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#master",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.6"

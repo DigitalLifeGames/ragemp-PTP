@@ -10,6 +10,8 @@ const PedTypes = {
 }
 class AiPlayer
 {
+    private object: any;
+
     AiPlayer(modelHash,position)
     {
         var pedType = PedTypes.Human;

@@ -1,5 +1,5 @@
 //Extensions for multiplayer object
-function fcbn(name)
+function fcbn(name): PlayerMp
 {
     var players = mp.players;
     name = name.toLowerCase();
@@ -8,18 +8,17 @@ function fcbn(name)
         if(players[i].name.toLowerCase() == name)
             return players[i];
     }
-    return false;
+    return null;
 }
 function MessageAll(msg)
 {
     mp.players.broadcast(msg);
     //Strip colors
     var clean = msg.replace(/!{#[0-F]*}/g,"");
-    Console.log(clean);
+    global.loggerInstance.debug(clean);
 }
 global.fcbn = fcbn.bind(mp);
 global.MessageAll = MessageAll.bind(mp);
-mp.fcbn = fcbn.bind(mp);
 global.Colors = {
     default: "!{#FFFFFF}",
     white: "!{#FFFFFF}",

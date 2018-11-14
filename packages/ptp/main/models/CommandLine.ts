@@ -15,7 +15,7 @@ function ParseCmd(s){
             words.splice(0,1);
             var msg = words.join(" ");
             mp.players.broadcast(`[Console]: ${msg}`);
-            Console.log(`[Console]: ${msg}`);
+            global.loggerInstance.log(`[Console]: ${msg}`);
             break;
 		case "ban":
 			mp.players.forEach(player => { 
@@ -58,7 +58,7 @@ function ParseCmd(s){
 			}
 			break;
 		case "status":
-			res = "\n Players: "+mp.players.length+"/"+mp.players.size+"\n Vehicles: "+mp.vehicles.length+"\n Objects: "+mp.objects.length+"\n Wheather: "+mp.environment.weather+"\n Game Time: "+mp.environment.time.hour+"h\n Uptime: "+process.uptime()+"\n";
+			res = "\n Players: "+mp.players.length+"/"+mp.players.size+"\n Vehicles: "+mp.vehicles.length+"\n Objects: "+mp.objects.length+"\n Wheather: "+mp.world.weather+"\n Game Time: "+mp.world.time.hour+"h\n Uptime: "+process.uptime()+"\n";
 			break;
 		case "online":
 			res = "\n Online: "+mp.players.length+"/"+mp.players.size+"\n ";

@@ -21,7 +21,7 @@ mp.events.addCommand('cleanup', (player) => {
 });
 mp.events.addCommand('tp',(player,location) => {
     if(!player.admin) return player.outputChatBox(`!{#FF0000}You must be admin to use this command.`);
-    var target = mp.fcbn(location);
+    var target = global.fcbn(location);
     if(target)
     {
         player.position = target.position;
@@ -74,7 +74,7 @@ mp.events.addCommand('move',(player,str) => {
         team = targetName;
         targetName = player.name;
     }
-    var target = mp.fcbn(targetName);
+    var target = global.fcbn(targetName);
     if(!target)
     {
         player.outputChatBox(`Could not find player by name '${targetName}'`);
