@@ -57,6 +57,7 @@ class Database
         p.then((data) => {
             var acc = data[0];
             playerObj.logged = true;
+            playerObj.locked = true;
             if(acc.admin)
             {
                 playerObj.admin = true;

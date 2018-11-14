@@ -1,0 +1,10 @@
+{
+    "info": {
+      "title": "[Development] Protect the President Service",
+      "version": "0.0.3",
+      "description": "RageMP Protect the President service. Contains end points to retrieve real time information about the current PTPMinigame."
+    },
+    "port": 3000,
+    "host": "localhost:3000",
+    "basePath": "/"
+}

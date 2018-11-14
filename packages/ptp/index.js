@@ -1,5 +1,6 @@
 //Process arguments (Debug, Mock mode)
 var debug = false;
+global.ENVIRONMENT = process.env.ENVIRONMENT;
 var mock = false;
 process.argv.forEach(function (val, index, array) {
     if(val == "mock")
@@ -24,13 +25,21 @@ Console.open("logs/" + Date.now() + ".log",{log_colors: false});
 var DatabaseDAO = require("./main/database.js");
 var ServiceDAO = require("./service/main.js");
 
-//Create database
+//Load database configuration
 var dbConfig = {username: "username",password: "password",host: "localhost",database: "ptp_db"};
 try {   
-    dbConfig = require("./db_config.json");
+    dbConfig = require(`./configs/db_config${ENVIRONMENT=="DEV" ? "-dev":""}.json`);
 } catch(e) {
     Console.debug("Could not find database configuration, using default...");
 }
+//Load PTP service configuration
+var serviceConfig = {};
+try {
+    serviceConfig = require(`./configs/service_config${ENVIRONMENT=="DEV" ? "-dev":""}.json`);
+} catch(e) {
+    Console.debug("Could not find service configuration, using default...");
+}
+
 global.Database = new DatabaseDAO(dbConfig,err => {
     if (err)
     {
@@ -51,16 +60,16 @@ var preferences = require("./configs/default.js");
 
 let Game = require("./main/state.js").GameState;
 global.CurrentGame = mp.Game = new Game(preferences);
-CurrentGame.start();
-
 //Create PTPService
-global.Service = new ServiceDAO();
+global.Service = new ServiceDAO(serviceConfig);
+
+//Start services
+CurrentGame.start();
 Service.start();
 
 //Are we mocking
 if(!mock) return;
 
-CurrentGame.end();
 Console.log("");
 //Simulate players
 Mock.AddPlayer(new mp.Player("Plornt"));
@@ -79,4 +88,4 @@ setTimeout(function() {
     CurrentGame.endRound(mp.Game.getTeam(fcbn("Plornt")));
     CurrentGame.end();
     Database.close();
-},5000);
+},30000);

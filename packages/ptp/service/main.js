@@ -4,28 +4,40 @@
     Version: 1.0
     Description: This service is designed to provide a Restful API service to interact with the PTP minigame
 */
-process.env.SUPPRESS_NO_CONFIG_WARNING = 'y';
-var SwaggerExpress = require('swagger-express-mw');
+var swaggerJSDoc = require('swagger-jsdoc');
 var express = require('express');
-var config = {
-  appRoot: __dirname // required config
-};
 var swaggerUi = require('swagger-ui-express');
 
+
+// swagger definition
+
+
+//Load api routes
+var glob = require( 'glob' ), path = require( 'path' );
+
 class PTPService {
-    constructor() {
+    constructor(sDefinition) {
         var app = express();
         this.app = app;
-        this.port = 3000;
+        this.port = sDefinition.port;
 
-        SwaggerExpress.create(config, (err, swaggerExpress) => {
-        if (err) { throw err; }
-            // install middleware
-            swaggerExpress.register(app);
+        var routes = __dirname + '/api/*/*.js';
+        glob.sync(routes).forEach( function( file ) {
+            var route = require(path.resolve(file));
+            if(typeof route == "function")
+                route(app);
         });
+        // initialize swagger-jsdoc
+        var swaggerSpec = swaggerJSDoc({
+            // import swaggerDefinitions
+            swaggerDefinition: sDefinition,
+            // path to the API docs
+            apis: [routes],// pass all in array 
+        });
+        app.get('/swagger.json', function(req, res) {   res.setHeader('Content-Type', 'application/json');   res.send(swaggerSpec); });
         //Setup 
         app.use('/api', swaggerUi.serve, swaggerUi.setup(null, {
-            swaggerUrl: `/swagger`
+            swaggerUrl: `/swagger.json`
         }));
     }
     start() {
