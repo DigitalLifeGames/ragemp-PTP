@@ -20,6 +20,7 @@ class PTPService {
         var app = express();
         this.app = app;
         this.port = sDefinition.port;
+        delete sDefinition.port;
 
         var routes = __dirname + '/api/*/*.js';
         glob.sync(routes).forEach( function( file ) {
@@ -40,12 +41,16 @@ class PTPService {
             swaggerUrl: `/swagger.json`
         }));
     }
-    start() {
-        this.app.listen(this.port,'0.0.0.0');
+    start(game) {
+        this.game = game;
+        this._server = this.app.listen(this.port,'0.0.0.0');
+        this.app.set("service",this);
         Console.log(`PTP Service is currently running on port [${this.port}]...`);
     }
     stop() {
-        
+        if(!this._server)
+            return;
+        this._server.close();
     }
 }
 module.exports = PTPService;

@@ -14,8 +14,8 @@
 *           type: array
 *           items:
 *             $ref: '#/definitions/Player'
- *           
- */
+*           
+*/
 function Players(req, res) {
     var data = {
         players: []

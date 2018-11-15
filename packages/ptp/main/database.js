@@ -117,7 +117,7 @@ class Database
             }
             var p = this.update("account_detail",{ id: row.id},row); 
             p.then(data => {
-                Console.log(`Successfully updated score for ${username}`);
+                //Console.log(`Successfully updated score for ${username}`);
             });
             return p;
         });

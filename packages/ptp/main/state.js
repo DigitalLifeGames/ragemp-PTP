@@ -71,7 +71,7 @@ class GameState
             }
         }));
         //TODO: Move this logic out of database...
-        if(Database)
+        if(global.Database)
             Database.select("vehicles",{}).then((rows) => {
             rows.forEach(vehicleData => {
                 var pos = vehicleData.position.split(" ");
@@ -328,7 +328,7 @@ class GameState
         if(team.hidden != false)
             this.createBlip(player);
         
-        mp.Game.spawnPlayer(player);
+        this.spawnPlayer(player);
     }
     spawnPlayer(player) {
         var team = this.getTeam(player);
@@ -553,7 +553,7 @@ class GameState
                 rounds: 1
             };
 
-            if(Database)
+            if(global.Database)
                 Database.addScore(pl.name,score).catch(err => {
                 console.log(`Could not update score for user ${pl.name}`);
             });
@@ -586,4 +586,4 @@ class GameState
     }
     
 }
-module.exports.GameState = GameState;
+module.exports = GameState;

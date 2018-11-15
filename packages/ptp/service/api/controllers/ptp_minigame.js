@@ -18,7 +18,7 @@ var Game = mp.Game;
  */
 function State(req,res) {
     res.json({
-        state: mp.Game.state
+        state: req.app.get("service").game.state
     });
 }
 /**
@@ -39,7 +39,7 @@ function State(req,res) {
  */
 function Current(req,res)
 {
-    var game = Game;
+    var game = req.app.get("service").game;
     var teams = game.teams.map(t => new Object({
         teamColor: t.teamColor,
         name: t.name,

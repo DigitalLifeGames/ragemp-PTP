@@ -1,17 +1,31 @@
 var assert = require("assert");
 global.mp = mp = require("./mock/Multiplayer.js");
-require("../packages/ptp/index.js");
-var DatabaseDAO = require("../packages/ptp/main/database.js");
-var database = Database;
+var dbConfig;
+try {
+    dbConfig = require(`../packages/ptp/configs/db_config-dev.json`);
+} catch(e) {
+    console.log("No db_config-dev.json. Cannot run database tests.");
+    return;
+}
+var DatabaseDAO = require(`../packages/ptp/main/database.js`);
+var database = new DatabaseDAO(dbConfig);
 
-//dbConfig.host = "localhost";
 describe('Database Integrity Tests',() => {
     
-    var tests = [];
     var p = database.connect();
+    p.then(() => {
+        describe('Database Integrity Tests',() => {
+            DoTests();
+        });
+        after(done => {
+            database.close();
+            done();
+        });        
+    },(err) => {
+        assert.fail(err);
+    });
     it('Can connect to remote database',() =>
     {
-        tests.push(p);
         return p;
     });
     /*
@@ -20,63 +34,39 @@ describe('Database Integrity Tests',() => {
         return database.connect();
     });
     */
-   it('Test account exists/create',function ()
-   {
-        var t = p.then(() => database.select("accounts",{username: "test"}).catch(() =>
+   var DoTests = () => {
+   it('Test account exists/create',function () {
+        return database.select("accounts",{username: "test"}).catch(() =>
         {
-            var t = database.createAccount({
+            return database.createAccount({
                 username: "test",
                 password: "testpasword"
             });
-            tests.push(t);
-            return t;
-        }));
-        tests.push(p);
-        return t;
+        });
     });
     it('Can log into test user account',function () {
-
-        var t = p.then(() => database.login(new mp.Player("test"),"testpassword"));
-        tests.push(t);
-        return t;
+        return database.login(new mp.Player("test"),"testpassword");
     });
     it('Can add score to test account',function () {
-
-        var t = p.then(() => database.addScore("test",{
+        return database.addScore("test",{
             kills: 1,
             wins: 1,
             president: 1,
-        }));
-        tests.push(t);
-        return t;
+        });
     });
     it('Can set password for test account',function () {
-
-        var player = new mp.Player("test");
-        var t = p.then(() => {
-            var t = database.setPassword(player.name,"testpassword");
-            tests.push(t);
-            return t;
-        });
-        tests.push(t);
-        return t;
+        return database.setPassword("test","testpassword");
     });
     it('Can add vehicle spawn to database',function () {
-
-        return p=database.insert("vehicles",{
+        return database.insert("vehicles",{
             position: "10 20 30",
             rotation: 10,
             datablock: "FIB2"
         });
     });
     it('Vehicle manifest from database',function () {
-        var t = p.then(() => database.select("vehicles",{
-        }));
-        return t;
+        return database.select("vehicles",{
+        });
     });
-    Promise.all(tests).then( ()=> {
-        setTimeout(function () {
-            database.close();
-        },500);
-    });
+   }
 });

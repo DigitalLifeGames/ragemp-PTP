@@ -1,12 +1,13 @@
 var assert = require("assert");
 global.Console = require("../packages/ptp/main/models/Logger.js").Console;
 mp = require("./mock/Multiplayer.js");
-var GameState = require("../packages/ptp/main/state.js").GameState;
+//GameState depends on Console object and MP extentions
+if(!global.Console) global.Console = require(`../packages/ptp/main/models/Logger.js`).Console;
+require("../packages/ptp/main/models/Multiplayer.js");
+Console.log = ()=> {}
+var GameState = require("../packages/ptp/main/state.js");
 var preferences = require("../packages/ptp/configs/default.js");
 
-//Disable logging
-Console.log = () => {}
-global.Database = undefined;
 describe('Team Balance Tests',() => {
     
     it('1 Player: Doesn\'t start',function () {

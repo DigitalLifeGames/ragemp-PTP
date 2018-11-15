@@ -58,18 +58,19 @@ require('./main/commands.js');
 var preferences = require("./configs/default.js");
 
 
-let Game = require("./main/state.js").GameState;
+let Game = require("./main/state.js");
 global.CurrentGame = mp.Game = new Game(preferences);
 //Create PTPService
 global.Service = new ServiceDAO(serviceConfig);
 
 //Start services
 CurrentGame.start();
-Service.start();
+Service.start(CurrentGame);
 
 //Are we mocking
 if(!mock) return;
 
+/*
 Console.log("");
 //Simulate players
 Mock.AddPlayer(new mp.Player("Plornt"));
@@ -89,3 +90,4 @@ setTimeout(function() {
     CurrentGame.end();
     Database.close();
 },30000);
+*/
