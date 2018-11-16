@@ -39,18 +39,6 @@ try {
 } catch(e) {
     Console.debug("Could not find service configuration, using default...");
 }
-
-global.Database = new DatabaseDAO(dbConfig,err => {
-    if (err)
-    {
-        Console.error("Unable to connect to database");
-        Console.error(`-- ${dbConfig.username}:******@${dbConfig.host}`);
-        return;
-    }
-    Console.log("Connected to the database");
-});
-Database.check();
-
 // Init commands/events.
 require('./main/events.js');
 require('./main/commands.js');
@@ -59,11 +47,20 @@ var preferences = require("./configs/default.js");
 
 
 let Game = require("./main/state.js");
+let Service = new ServiceDAO(serviceConfig);
 global.CurrentGame = mp.Game = new Game(preferences);
-//Create PTPService
-global.Service = new ServiceDAO(serviceConfig);
-
+var db = new DatabaseDAO(dbConfig,err => {
+    if (err)
+    {
+        Console.error("Unable to connect to database");
+        Console.error(`-- ${dbConfig.username}:******@${dbConfig.host}`);
+        return;
+    }
+    Console.log("Connected to the database");
+});
+db.check();
 //Start services
+CurrentGame.setDatabase(db);
 CurrentGame.start();
 Service.start(CurrentGame);
 

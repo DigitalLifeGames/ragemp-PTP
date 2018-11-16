@@ -71,8 +71,8 @@ class GameState
             }
         }));
         //TODO: Move this logic out of database...
-        if(global.Database)
-            Database.select("vehicles",{}).then((rows) => {
+        if(this.database())
+            this.database().select("vehicles",{}).then((rows) => {
             rows.forEach(vehicleData => {
                 var pos = vehicleData.position.split(" ");
                 var rot = vehicleData.rotation.split(" ");
@@ -553,8 +553,8 @@ class GameState
                 rounds: 1
             };
 
-            if(global.Database)
-                Database.addScore(pl.name,score).catch(err => {
+            if(this.database())
+                this.database().addScore(pl.name,score).catch(err => {
                 console.log(`Could not update score for user ${pl.name}`);
             });
         });
@@ -584,6 +584,12 @@ class GameState
         });
         MessageAll("Protect the President has ended.");
     }
-    
+    setDatabase(db)
+    {
+        this._database = db;
+    }
+    database() {
+        return this._database;
+    }
 }
 module.exports = GameState;
