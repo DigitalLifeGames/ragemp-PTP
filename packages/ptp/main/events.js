@@ -49,7 +49,8 @@ mp.events.add('playerJoin',(player) => {
     if(mp.Game.state > 0)
         mp.Game.add(player);
     
-    Database.accountExists(player.name).then((data) => {
+    if(mp.Game.database())
+        mp.Game.database().accountExists(player.name).then((data) => {
         var acc = data[0];
         if(acc.locked)
             player.outputChatBox("Type /login to login");
@@ -60,7 +61,7 @@ mp.events.add('playerJoin',(player) => {
         }
     }).catch(() => {
         //Create them an unsecure account
-        Database.createAccount({
+        mp.Game.database().createAccount({
             password: "",
             username: player.name
         }).then(() => {

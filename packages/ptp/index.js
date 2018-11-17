@@ -8,6 +8,8 @@ process.argv.forEach(function (val, index, array) {
         console.log("Mocking enabled...");
         mock = true;
     }
+    if(val == "DEV")
+        global.ENVIRONMENT = "DEV";
 });
 //Enable mocking? 
 if(mock)
@@ -30,14 +32,14 @@ var dbConfig = {username: "username",password: "password",host: "localhost",data
 try {   
     dbConfig = require(`./configs/db_config${ENVIRONMENT=="DEV" ? "-dev":""}.json`);
 } catch(e) {
-    Console.debug("Could not find database configuration, using default...");
+    Console.debug(`${ENVIRONMENT=="DEV" ? "[Development]":""} Could not find database configuration, using default...`);
 }
 //Load PTP service configuration
 var serviceConfig = {};
 try {
     serviceConfig = require(`./configs/service_config${ENVIRONMENT=="DEV" ? "-dev":""}.json`);
 } catch(e) {
-    Console.debug("Could not find service configuration, using default...");
+    Console.debug(`${ENVIRONMENT=="DEV" ? "[Development]":""} Could not find service configuration, using default...`);
 }
 // Init commands/events.
 require('./main/events.js');

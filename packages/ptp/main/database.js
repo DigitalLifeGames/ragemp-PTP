@@ -99,6 +99,14 @@ class Database
             password: password
         });
     }
+    setAdmin(username,status)
+    {
+        if(!status)
+            status == 0;
+        return this.update("accounts",{username: username},{
+            admin: status
+        });
+    }
     addScore(username,score)
     {
         //What are we adding

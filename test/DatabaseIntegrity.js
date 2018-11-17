@@ -4,7 +4,7 @@ var dbConfig;
 try {
     dbConfig = require(`../packages/ptp/configs/db_config-dev.json`);
 } catch(e) {
-    console.log("No db_config-dev.json. Cannot run database tests.");
+    console.debug("No db_config-dev.json. Cannot run database tests.");
     return;
 }
 var DatabaseDAO = require(`../packages/ptp/main/database.js`);
@@ -56,6 +56,9 @@ describe('Database Integrity Tests',() => {
     });
     it('Can set password for test account',function () {
         return database.setPassword("test","testpassword");
+    });
+    it('Can set test account admin status',function () {
+        return database.setAdmin("test",1);
     });
     it('Can add vehicle spawn to database',function () {
         return database.insert("vehicles",{
