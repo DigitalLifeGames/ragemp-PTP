@@ -1,6 +1,8 @@
 //Extensions for multiplayer object
 function fcbn(name)
 {
+    if(!name)
+        return false;
     var players = mp.players;
     name = name.toLowerCase();
     for(var i=0;i<players.length;i++)
