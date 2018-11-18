@@ -369,6 +369,8 @@ class GameState
         });
     }
     playerDeath(player,killer) {
+        if(this.state < 2)
+            return;
         if(!killer)
             killer = player;
         else

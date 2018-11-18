@@ -50,7 +50,40 @@ function Players(req, res) {
 function Time(req,res) {
     res.send(`${process.uptime()}`);
 }
+/**
+ * @swagger
+ * /server/vehicles:
+ *   get:
+ *     tags:
+ *       - Server
+ *     description: Retrieve all vehicles spawned within the server
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: All vehicles within the server
+ *         schema:
+*           type: array
+*           items:
+*             $ref: '#/definitions/Vehicle'
+ *           
+ */
+function Vehicles(req,res)
+{
+    var data = {
+        vehicles: []
+    };
+    mp.vehicles.forEach(v => {
+        var pos = [v.position.x,v.position.y,v.position.z];
+        data.vehicles.push({
+            position: pos,
+            datablock: v.model
+        });
+    });
+    res.json(data);
+}
 module.exports = function(app) {
     app.route('/server/players').get(Players);
     app.route('/server/time').get(Time);
+    app.route('/server/vehicles').get(Vehicles);
 };

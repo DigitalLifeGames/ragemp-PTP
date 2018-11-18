@@ -34,8 +34,7 @@ function State(req,res) {
  *       200:
  *         description: MinigameState representing current state of the minigame
  *         schema:
- *           type:
- *              - integer
+ *           $ref: '#/definitions/MinigameState'
  */
 function Current(req,res)
 {
